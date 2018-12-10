@@ -9,7 +9,7 @@
 #- name: define master instance count
 #  set fact:
 #    MASTER_LOCAL_CONFIG: |
-#      value: "{{ master_vm_size }}"
+#      value: "{{ master_vm_size }}
 
 - name: Create Azure Deploy
   azure_rm_deployment:
@@ -20,6 +20,11 @@
     secret: "{{ azure_client_secret }}"
     tenant: "{{ azure_tenant_id }}"
     template_link: https://raw.githubusercontent.com/Joel-Adams/openshift-container-platform/workshopv3/azuredeploy.json
+    vars:
+      - master_count: {{ number_master_nodes | int }}
+    tasks:
+      - debug
+          msg: "{{ master_count }}"
     parameters:
       masterVmSize:
         value: "{{ master_vm_size }}"
@@ -38,7 +43,7 @@
       openshiftClusterPrefix:
         value: "{{ openshift_cluster_prefix }}"
       masterInstanceCount:
-        value: "{{ number_master_nodes }}"
+        value: "{{ master_count }}"
       infraInstanceCount:
         value: "{{ number_infra_nodes }}"
       nodeInstanceCount:
