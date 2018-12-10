@@ -2,9 +2,20 @@
 #---------------------------------------------------
 #  Azure Infra Creation
 #---------------------------------------------------
-- name: Create Azure Deploy
-  azure_rm_deployment:
-    state: present
-    resource_group_name: "{{ resource_group_name }}"
-    template_link: src=azure_template.j2
-    parameters_link: src=azure_parameters.j2
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+    - name: Create json deploymentParameters
+      template: src=templates/parameters.json.j2 dest=/var/tmp/parameters.json
+
+    - name: Create Azure Deploy
+      azure_rm_deployment:
+        state: present
+        resource_group_name: "{{ resource_group_name }}"
+        subscription_id: "{{ azure_subscription_id }}"
+        client_id: "{{ azure_client_id }}"
+        secret: "{{ azure_client_secret }}"
+        tenant: "{{ azure_tenant_id }}"
+        template_link: https://raw.githubusercontent.com/Joel-Adams/openshift-container-platform/workshopv3/azuredeploy.json
+        parameters: '{{ lookup("file", "/var/tmp/parameters.json") }}'

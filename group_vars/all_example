@@ -23,15 +23,15 @@ routing_sub_domain:               "contoso.com"
 # azure.infra                |    AZURE Terraform Vars
 resource_group_name:              "ocpv3_workshop"
 number_master_nodes:              "3"            # 1,3, or 5 master nodes
-number_infra_nodes:               "3"            # Infrastructure Nodes
-number_nodes:                     "2"            # Number of Application Nodes
+number_infra_nodes:               "3"            # 1,2, or 3 Infrastructure Nodes
+number_nodes:                     "2"            # 1-30 Application Nodes
 master_vm_size:                   "Standard_E2s_v3"    # Master VM Size
 node_vm_size:                     "Standard_D4s_v3"    # Node Instance Size
 infra_vm_size:                    "Standard_D4s_v3"    # Infra Instance Size
 cns_vm_size:                      "Standard_E4s_v3"    # CNS Instance Size
 region:                           "eastus2"    # Azure Region
 azure_image_id:                   ""    # Azure ID of custom image sourceImageURI
-data_disk_size:                   "128"  #GB size of Data Disk
+data_disk_size:                   "128"  #GB size of Data Disk - Allowed Values 32,64,128,256,512,1024,2048
 openshift_cluster_prefix:         "snxocp2"  # All_lower_case
 openshift_admin_username:	  "ocpadmin"
 openshift_password:		  "RedHat!@#123"
@@ -64,17 +64,9 @@ node_subnet_name:                 "nodesubnet"
 node_subnet_prefix:               "13.3.0.0/16"
 routing_cert_type:                "selfsigned"
 master_cert_type:                 "selfsigned"
+master_private_cluster_ip:	      "13.1.0.200"
+router_private_cluster_ip:        "13.1.0.201"
 #--------------------------------------------------------------------------------------
 # wetty                    |      password
 workshop_password:                "redhat!@#"
 #--------------------------------------------------------------------------------------
-
-#######################################################################################
-# ANSIBLE config           |      VALUE
-#######################################################################################
-# Dynamic Inventory
-inventory_working_dir:            "{{ lookup('env','PWD') }}/inventory"
-# Ansible SSH Key Location |      SSH Key Vars
-ssh_key_path:                     "{{ terraform_working_dir }}/{{ workshop_prefix }}-tower"
-ansible_ssh_private_key_file:     "{{ terraform_working_dir }}/{{ workshop_prefix }}-tower"
-system_user:                      "labuser"    # Azure
