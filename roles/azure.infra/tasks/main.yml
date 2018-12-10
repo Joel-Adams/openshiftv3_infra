@@ -6,6 +6,11 @@
 - name: Create json deploymentParameters
   template: src=templates/master_count.j2 dest=/var/tmp/master_parameters
 
+- name: define master instance count
+  set fact:
+    MASTER_LOCAL_CONFIG: |
+      value: "{{ master_vm_size }}"
+
 - name: Create Azure Deploy
   azure_rm_deployment:
     state: present
@@ -17,7 +22,7 @@
     template_link: https://raw.githubusercontent.com/Joel-Adams/openshift-container-platform/workshopv3/azuredeploy.json
     parameters:
       masterVmSize:
-        value: "{{ master_vm_size }}"
+        MASTER_LOCAL_CONFIG: "{{MASTER_LOCAL_CONFIG|from_yaml|to_json}}"
       infraVmSize:
         value: "{{ infra_vm_size }}"
       nodeVmSize:
