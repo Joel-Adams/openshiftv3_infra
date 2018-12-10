@@ -38,7 +38,7 @@
       openshiftClusterPrefix:
         value: "{{ openshift_cluster_prefix }}"
       masterInstanceCount:
-        value: "{{ number_master_nodes | to_json | regex_replace"("([0-9]+)",'\1')" }}"
+        value: "{{ number_master_nodes | int }}"
       infraInstanceCount:
         value: "{{ number_infra_nodes }}"
       nodeInstanceCount:
