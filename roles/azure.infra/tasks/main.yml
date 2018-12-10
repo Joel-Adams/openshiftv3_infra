@@ -23,7 +23,7 @@
     vars:
       - master_count: {{ number_master_nodes | int }}
     tasks:
-      - debug
+      - debug:
           msg: "{{ master_count }}"
 #    parameters:
 #      masterVmSize:
