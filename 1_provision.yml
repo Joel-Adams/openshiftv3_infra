@@ -6,7 +6,7 @@
 - name: Provision Azure Infrastucture using Terraform
   hosts: local_target
   roles:
-  - { role: azure.infra, tags: ["tf_create"] }
+  - { role: azure.infra }
 
 # {{workshop_prefix}}.tower.<student number>.redhatgov.io:8888
 # Username: azure-user
