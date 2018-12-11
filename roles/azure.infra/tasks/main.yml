@@ -21,7 +21,7 @@
     tenant: "{{ azure_tenant_id }}"
 #    template_link: https://raw.githubusercontent.com/Joel-Adams/openshift-container-platform/workshopv3/azuredeploy.json
     var:
-      - master_count: 3
+      - master_count: '3'
     tasks:
       - debug:
           msg: "{{ master_count }}"

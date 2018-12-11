@@ -1,13 +1,8 @@
 # file: 1_provision.yml
 ---
-# https://www.terraform.io/docs/providers/azurerm
 
 
 - name: Provision Azure Infrastucture using Terraform
   hosts: localhost
   roles:
   - { role: azure.infra }
-
-# {{workshop_prefix}}.tower.<student number>.redhatgov.io:8888
-# Username: azure-user
-# Password: redhat!@#
