@@ -38,13 +38,13 @@
      openshiftClusterPrefix:
        value: "{{ openshift_cluster_prefix }}"
      masterInstanceCount:
-       value: "{{ number_master_nodes | int * 1}}"
+       value: 3
      infraInstanceCount:
-       value: "{{ number_infra_nodes }}"
+       value: 3
      nodeInstanceCount:
-       value: "{{ number_nodes }}"
+       value: 3
      dataDiskSize:
-       value: "{{ data_disk_size }}"
+       value: 128
      adminUsername:
        value: "{{ openshift_admin_username }}"
      openshiftPassword:
