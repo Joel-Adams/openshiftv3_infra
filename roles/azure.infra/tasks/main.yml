@@ -20,6 +20,7 @@
    tenant: "{{ azure_tenant_id }}"
    resource_group_name: "{{ resource_group_name }}"
    template_link: https://raw.githubusercontent.com/Joel-Adams/openshift-container-platform/workshopv3/azuredeploy.json
+   region: "{{ region }}"
    # template_link: https://raw.githubusercontent.com/Joel-Adams/openshift-container-platform/master/azuredeploy.json
    parameters:
      masterVmSize:
