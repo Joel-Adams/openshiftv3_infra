@@ -65,7 +65,7 @@ node_subnet_prefix:               "13.3.0.0/16"
 routing_cert_type:                "selfsigned"
 master_cert_type:                 "selfsigned"
 master_private_cluster_ip:	      "13.1.0.200"
-router_private_cluster_ip:        "13.1.0.201"
+router_private_cluster_ip:        "13.2.0.201"
 #--------------------------------------------------------------------------------------
 # wetty                    |      password
 workshop_password:                "redhat!@#"

@@ -33,6 +33,8 @@
        value: "sourceImageURI"
      sourceImageURI:
        value: "{{ azure_image_id }}"
+     marketplaceOsImage:
+       value: "{"publisher": "redhat","offer": "rhel-byos","sku": "rhel-75","version": "latest"}"
      storageKind:
        value: "managed"
      openshiftClusterPrefix:
@@ -73,6 +75,10 @@
        value: "{{ key_vault_secret }}"
      enableAzure:
        value: "false"
+     aadClientId:
+       value: ""
+     aadClientSecret:
+       value: ""
      masterClusterDnsType:
        value: "default"
      masterClusterDns:
@@ -117,6 +123,8 @@
        value: "public"
      routerPrivateClusterIp:
        value: "{{ router_private_cluster_ip }}"
+     customHeaderImage:
+       value: ""
      routingCertType:
        value: "selfsigned"
      masterCertType:
