@@ -42,9 +42,6 @@ cloud_access:                      true
 username:                         ""
 password:                         ""
 pool_id:                          ""
-# subscription_manager     |      Red Hat Subscription via activation keys
-rhsm_activationkey:               ""
-rhsm_org_id:                      ""
 #--------------------------------------------------------------------------------------
 # key vault                |      Azure Key Vault Information
 ssh_public_key:                   "" # Full public key
