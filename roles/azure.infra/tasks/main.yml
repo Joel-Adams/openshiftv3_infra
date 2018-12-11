@@ -35,6 +35,7 @@
        value: "{{ azure_image_id }}"
      storageKind:
        value: "managed"
+     openshiftClusterPrefix:
        value: "{{ openshift_cluster_prefix }}"
      masterInstanceCount:
        value: "{{ number_master_nodes|int }}"
