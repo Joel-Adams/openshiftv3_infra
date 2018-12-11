@@ -3,8 +3,8 @@
 #  Azure Infra Creation
 #---------------------------------------------------
 
-- name: Create json deploymentParameters
-  template: src=templates/master_count.j2 dest=/var/tmp/master_parameters
+#- name: Create json deploymentParameters
+#  template: src=templates/master_count.j2 dest=/var/tmp/master_parameters
 
 #- name: define master instance count
 #  set fact:
@@ -12,14 +12,14 @@
 #      value: "{{ master_vm_size }}
 
 - name: Create Azure Deploy
-  azure_rm_deployment:
-    state: present
-    resource_group_name: "{{ resource_group_name }}"
-    subscription_id: "{{ azure_subscription_id }}"
-    client_id: "{{ azure_client_id }}"
-    secret: "{{ azure_client_secret }}"
-    tenant: "{{ azure_tenant_id }}"
-    template_link: https://raw.githubusercontent.com/Joel-Adams/openshift-container-platform/workshopv3/azuredeploy.json
+#  azure_rm_deployment:
+#    state: present
+#    resource_group_name: "{{ resource_group_name }}"
+#    subscription_id: "{{ azure_subscription_id }}"
+#    client_id: "{{ azure_client_id }}"
+#    secret: "{{ azure_client_secret }}"
+#    tenant: "{{ azure_tenant_id }}"
+#    template_link: https://raw.githubusercontent.com/Joel-Adams/openshift-container-platform/workshopv3/azuredeploy.json
     var:
       - master_count: 3
     tasks:
