@@ -21,7 +21,7 @@
    template_link: https://raw.githubusercontent.com/Joel-Adams/openshift-container-platform/workshopv3/azuredeploy.json
    parameters:
      masterVmSize:
-       value: "{{ master_vm_size|int }}"
+       value: "{{ master_vm_size }}"
      infraVmSize:
        value: "{{ infra_vm_size }}"
      nodeVmSize:
@@ -36,7 +36,7 @@
        value: "managed"
        value: "{{ openshift_cluster_prefix }}"
      masterInstanceCount:
-       value: "{{ master_count }}"
+       value: "{{ number_master_nodes|int }}"
      infraInstanceCount:
        value: "{{ number_infra_nodes }}"
      nodeInstanceCount:
