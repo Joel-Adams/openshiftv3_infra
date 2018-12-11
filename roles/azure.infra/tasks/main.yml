@@ -82,10 +82,10 @@
        value: "{{ key_vault_secret }}"
      enableAzure:
        value: "false"
-     aadClientId:
-       value: "null"
-     aadClientSecret:
-       value: "null"
+     # aadClientId:
+     #   value: "null"
+     # aadClientSecret:
+     #   value: "null"
      masterClusterDnsType:
        value: "default"
      masterClusterDns:
@@ -130,8 +130,8 @@
        value: "public"
      routerPrivateClusterIp:
        value: "{{ router_private_cluster_ip }}"
-     customHeaderImage:
-       value: "null"
+     # customHeaderImage:
+     #   value: "null"
      routingCertType:
        value: "selfsigned"
      masterCertType:
