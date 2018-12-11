@@ -81,9 +81,9 @@
      enableAzure:
        value: "false"
      aadClientId:
-       value: ""
+       value: null
      aadClientSecret:
-       value: ""
+       value: null
      masterClusterDnsType:
        value: "default"
      masterClusterDns:
@@ -129,7 +129,7 @@
      routerPrivateClusterIp:
        value: "{{ router_private_cluster_ip }}"
      customHeaderImage:
-       value: ""
+       value: null
      routingCertType:
        value: "selfsigned"
      masterCertType:
