@@ -20,7 +20,8 @@
     secret: "{{ azure_client_secret }}"
     tenant: "{{ azure_tenant_id }}"
     template_link: https://raw.githubusercontent.com/Joel-Adams/openshift-container-platform/workshopv3/azuredeploy.json
-    master_count: "{{ number_master_nodes }}"
+    var:
+      - master_count: "{{ number_master_nodes }}"
     tasks:
       - debug:
           msg: "{{ master_count }}"
