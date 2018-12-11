@@ -19,8 +19,8 @@
    secret: "{{ azure_client_secret }}"
    tenant: "{{ azure_tenant_id }}"
    resource_group_name: "{{ resource_group_name }}"
-#   template_link: https://raw.githubusercontent.com/Joel-Adams/openshift-container-platform/workshopv3/azuredeploy.json
-   template_link: https://raw.githubusercontent.com/Joel-Adams/openshift-container-platform/master/azuredeploy.json
+   template_link: https://raw.githubusercontent.com/Joel-Adams/openshift-container-platform/workshopv3/azuredeploy.json
+   # template_link: https://raw.githubusercontent.com/Joel-Adams/openshift-container-platform/master/azuredeploy.json
    parameters:
      masterVmSize:
        value: "{{ master_vm_size }}"
