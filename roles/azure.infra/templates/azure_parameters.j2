@@ -1,11 +1,4 @@
-#----------------------------------------------
-# Variables
-#----------------------------------------------
-variable "masterVMsize" { default = "{{ master_vm_size }}" }
-variable "infrainstancecount" { default = "{{ number_infra_nodes }}" }
-
-
 masterVmSize:
-  value: "$masterVMsize"
+  value: "{{ master_vm_size }}"
 infraInstanceCount:
-  value: "$infrainstancecount"
+  value: "{{ number_infra_nodes }}"
