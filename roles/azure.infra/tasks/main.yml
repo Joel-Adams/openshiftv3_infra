@@ -1,15 +1,10 @@
 ---
 
 - name: Testing Casting
-  hosts: localhost
-  connection: local
-  gather_facts: false
-
+  add_host:
   vars:
     - an_int: 15
-
   tasks:
-
     - debug:
         msg: "{{ an_int }}"
 #---------------------------------------------------
