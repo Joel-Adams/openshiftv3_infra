@@ -18,7 +18,7 @@
    client_id: "{{ azure_client_id }}"
    secret: "{{ azure_client_secret }}"
    tenant: "{{ azure_tenant_id }}"
-   resourece_group_name: "{{ resource_group_name }}"
+   resource_group_name: "{{ resource_group_name }}"
    template_link: https://raw.githubusercontent.com/Joel-Adams/openshift-container-platform/workshopv3/azuredeploy.json
    parameters:
      masterVmSize:
