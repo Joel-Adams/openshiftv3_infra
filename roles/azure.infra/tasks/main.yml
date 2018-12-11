@@ -34,7 +34,7 @@
      sourceImageURI:
        value: "{{ azure_image_id }}"
      marketplaceOsImage:
-       value: "{"publisher": "redhat","offer": "rhel-byos","sku": "rhel-75","version": "latest"}"
+       value: "{'"publisher": "redhat","offer": "rhel-byos","sku": "rhel-75","version": "latest"'}"
      storageKind:
        value: "managed"
      openshiftClusterPrefix:
