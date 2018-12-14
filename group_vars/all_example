@@ -67,3 +67,5 @@ router_private_cluster_ip:        "13.2.0.201"
 # wetty                    |      password
 workshop_password:                "redhat!@#"
 #--------------------------------------------------------------------------------------
+#Environment Variables     |      Variables once playbook 1 has completed
+bastion_fqdn:                     ""
