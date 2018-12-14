@@ -1,0 +1,52 @@
+#--------------------------------------------------
+# Install docker containers
+#--------------------------------------------------
+
+- name: Make docker directory
+  become: yes
+  file:
+    path:  "/home/{{ openshift_admin_username }}/dockyard"
+    owner: "{{ openshift_admin_username }}"
+    mode: 0755
+    state: directory
+  when: install
+
+- name: Clone SNX wetty
+  git:
+    repo: "https://github.com/Joel-Adams/snx-wetty.git"
+    version: master
+    dest: "/home/{{ openshift_admin_username }}/dockyard"
+    accept_hostkey: yes
+  when: install
+
+- name: Clone SNX nginx
+  git:
+    repo: "https://github.com/Joel-Adams/snx-nginx.git"
+    version: master
+    dest: "/home/{{ openshift_admin_username }}/dockyard"
+    accept_hostkey: yes
+  when: install
+
+- name: Template over ansible.cfg
+  template:
+    dest="/home/{{ openshift_admin_username }}/dockyard/snx-nginx/conf.d/proxy.conf"
+    src=nginx.conf.j2
+  when: install
+
+- name: Build Wetty Image
+  docker_image:
+     path: "/home/{{ openshift_admin_username }}/dockyard/snx-wetty"
+     name: snx/wetty
+     tag: latest
+
+- name: Build Nginx Image
+  docker_image:
+     path: "/home/{{ openshift_admin_username }}/dockyard/snx-nginx"
+     name: snx/nginx
+     tag: latest
+
+- name: Run the new wetty image
+  command: docker run -d --name wetty-cntr --hostname wetty01 -v /etc/localtime:/etc/localtime:ro -p 127.0.0.1:3000:3000 snx/wetty:latest
+
+- name: Run the new nginx image
+  command: docker run -d --name nginx-proxy --hostname nginx-host01 -p 80:80 -p 443:443 --net="host" snx/nginx:latest

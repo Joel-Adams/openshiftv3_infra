@@ -1,24 +1,11 @@
 # file: 2_load.yml
 ---
-# https://www.terraform.io/docs/providers/azurerm
 
-- name: Wait for Azure VM's to become initialized
+- name: Setup workshop environment
   hosts: localhost
-  tasks:
-    - wait_for:
-        host: "{{ item }}"
-        port: 22
-        state: started
-        timeout: 300
-      with_items: "{{ groups.all_nodes }}"
-
-- name: Configure repositories on all nodes
-  become: yes
-  remote_user: azure-user
-  hosts: tower_nodes
   roles:
-    - { role: subscription_manager }
-    - { role: epel }
+    - { role: workshop_setup }
+
 
 - name: Configure repositories on tower nodes
   become: yes
@@ -72,8 +59,3 @@
     prep: no
   roles:
     - { role: ansible.tower }
-
-
-# {{workshop_prefix}}.tower.<student number>.redhatgov.io:8888
-# Username: azure-user
-# Password: redhat!@#
