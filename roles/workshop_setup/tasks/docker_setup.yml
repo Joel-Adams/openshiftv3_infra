@@ -9,7 +9,6 @@
     owner: "{{ openshift_admin_username }}"
     mode: 0755
     state: directory
-  when: install
 
 - name: Clone SNX wetty
   git:
@@ -17,7 +16,6 @@
     version: master
     dest: "/home/{{ openshift_admin_username }}/dockyard"
     accept_hostkey: yes
-  when: install
 
 - name: Clone SNX nginx
   git:
@@ -25,13 +23,11 @@
     version: master
     dest: "/home/{{ openshift_admin_username }}/dockyard"
     accept_hostkey: yes
-  when: install
 
-- name: Template over ansible.cfg
+- name: Template over nginx conf
   template:
     dest="/home/{{ openshift_admin_username }}/dockyard/snx-nginx/conf.d/proxy.conf"
     src=nginx.conf.j2
-  when: install
 
 - name: Build Wetty Image
   docker_image:
