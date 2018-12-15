@@ -2,6 +2,13 @@
 # Setup Bastion Firewall
 #--------------------------------------------------
 
+- name: Install Ansible Python 2 Dependencies
+  with_items:
+  - python-firewall
+  dnf:
+    name: "{{item}}"
+    state: present
+
 - name: Firewall exception https
   become: yes
   firewalld:
