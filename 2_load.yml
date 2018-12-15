@@ -2,7 +2,7 @@
 ---
 
 - name: Setup workshop environment
-  hosts: "{{ openshift_cluster_prefix }}-bastion"
+  hosts: "{{ openshift_cluster_prefix }}"-bastion
   roles:
     - { role: workshop_setup }
 
