@@ -2,7 +2,7 @@
 ---
 
 - name: Setup workshop environment
-  hosts: snxocp4-bastion
+  hosts: bastion_nodes
   roles:
     - { role: workshop_setup }
 
