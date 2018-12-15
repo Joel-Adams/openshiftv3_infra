@@ -2,7 +2,7 @@
 ---
 
 - name: Setup workshop environment
-  hosts: "{{ resource_group_name }}"
+  hosts: snxocp4-bastion
   roles:
     - { role: workshop_setup }
 
