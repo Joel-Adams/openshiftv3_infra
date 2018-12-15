@@ -1,540 +1,979 @@
-# Copyright (c) 2018 Ansible Project
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+#!/usr/bin/env python
+#
+# Copyright (c) 2016 Matt Davis, <mdavis@ansible.com>
+#                    Chris Houseknecht, <house@redhat.com>
+#
+# This file is part of Ansible
+#
+# Ansible is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Ansible is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
+#
 
-from __future__ import (absolute_import, division, print_function)
-__metaclass__ = type
+'''
+Important note (2018/10)
+========================
+This inventory script is in maintenance mode: only critical bug fixes but no new features.
+There's new Azure external inventory script at https://github.com/ansible/ansible/blob/devel/lib/ansible/plugins/inventory/azure_rm.py,
+with better performance and latest new features. Please go to the link to get latest Azure inventory.
 
-DOCUMENTATION = r'''
-    name: azure_rm
-    plugin_type: inventory
-    short_description: Azure Resource Manager inventory plugin
-    extends_documentation_fragment:
-      - azure
-    description:
-        - Query VM details from Azure Resource Manager
-        - Requires a YAML configuration file whose name ends with 'azure_rm.(yml|yaml)'
-        - By default, sets C(ansible_host) to the first public IP address found (preferring the primary NIC). If no
-          public IPs are found, the first private IP (also preferring the primary NIC). The default may be overridden
-          via C(hostvar_expressions); see examples.
-    options:
-        plugin:
-            description: marks this as an instance of the 'azure_rm' plugin
-            required: true
-            choices: ['azure_rm']
-        include_vm_resource_groups:
-            description: A list of resource group names to search for virtual machines. '\*' will include all resource
-                groups in the subscription.
-            default: ['*']
-        include_vmss_resource_groups:
-            description: A list of resource group names to search for virtual machine scale sets (VMSSs). '\*' will
-                include all resource groups in the subscription.
-            default: []
-        fail_on_template_errors:
-            description: When false, template failures during group and filter processing are silently ignored (eg,
-                if a filter or group expression refers to an undefined host variable)
-            choices: [True, False]
-            default: True
-        keyed_groups:
-            description: Creates groups based on the value of a host variable. Requires a list of dictionaries,
-                defining C(key) (the source dictionary-typed variable), C(prefix) (the prefix to use for the new group
-                name), and optionally C(separator) (which defaults to C(_))
-        conditional_groups:
-            description: A mapping of group names to Jinja2 expressions. When the mapped expression is true, the host
-                is added to the named group.
-        hostvar_expressions:
-            description: A mapping of hostvar names to Jinja2 expressions. The value for each host is the result of the
-                Jinja2 expression (which may refer to any of the host's existing variables at the time this inventory
-                plugin runs).
-        exclude_host_filters:
-            description: Excludes hosts from the inventory with a list of Jinja2 conditional expressions. Each
-                expression in the list is evaluated for each host; when the expression is true, the host is excluded
-                from the inventory.
-            default: []
-        batch_fetch:
-            description: To improve performance, results are fetched using an unsupported batch API. Disabling
-                C(batch_fetch) uses a much slower serial fetch, resulting in many more round-trips. Generally only
-                useful for troubleshooting.
-            default: true
-        default_host_filters:
-            description: A default set of filters that is applied in addition to the conditions in
-                C(exclude_host_filters) to exclude powered-off and not-fully-provisioned hosts. Set this to a different
-                value or empty list if you need to include hosts in these states.
-            default: ['powerstate != "running"', 'provisioning_state != "succeeded"']
+Azure External Inventory Script
+===============================
+Generates dynamic inventory by making API requests to the Azure Resource
+Manager using the Azure Python SDK. For instruction on installing the
+Azure Python SDK see https://azure-sdk-for-python.readthedocs.io/
+
+Authentication
+--------------
+The order of precedence is command line arguments, environment variables,
+and finally the [default] profile found in ~/.azure/credentials.
+
+If using a credentials file, it should be an ini formatted file with one or
+more sections, which we refer to as profiles. The script looks for a
+[default] section, if a profile is not specified either on the command line
+or with an environment variable. The keys in a profile will match the
+list of command line arguments below.
+
+For command line arguments and environment variables specify a profile found
+in your ~/.azure/credentials file, or a service principal or Active Directory
+user.
+
+Command line arguments:
+ - profile
+ - client_id
+ - secret
+ - subscription_id
+ - tenant
+ - ad_user
+ - password
+ - cloud_environment
+ - adfs_authority_url
+
+Environment variables:
+ - AZURE_PROFILE
+ - AZURE_CLIENT_ID
+ - AZURE_SECRET
+ - AZURE_SUBSCRIPTION_ID
+ - AZURE_TENANT
+ - AZURE_AD_USER
+ - AZURE_PASSWORD
+ - AZURE_CLOUD_ENVIRONMENT
+ - AZURE_ADFS_AUTHORITY_URL
+
+Run for Specific Host
+-----------------------
+When run for a specific host using the --host option, a resource group is
+required. For a specific host, this script returns the following variables:
+
+{
+  "ansible_host": "XXX.XXX.XXX.XXX",
+  "computer_name": "computer_name2",
+  "fqdn": null,
+  "id": "/subscriptions/subscription-id/resourceGroups/galaxy-production/providers/Microsoft.Compute/virtualMachines/object-name",
+  "image": {
+    "offer": "CentOS",
+    "publisher": "OpenLogic",
+    "sku": "7.1",
+    "version": "latest"
+  },
+  "location": "westus",
+  "mac_address": "00-00-5E-00-53-FE",
+  "name": "object-name",
+  "network_interface": "interface-name",
+  "network_interface_id": "/subscriptions/subscription-id/resourceGroups/galaxy-production/providers/Microsoft.Network/networkInterfaces/object-name1",
+  "network_security_group": null,
+  "network_security_group_id": null,
+  "os_disk": {
+    "name": "object-name",
+    "operating_system_type": "Linux"
+  },
+  "plan": null,
+  "powerstate": "running",
+  "private_ip": "172.26.3.6",
+  "private_ip_alloc_method": "Static",
+  "provisioning_state": "Succeeded",
+  "public_ip": "XXX.XXX.XXX.XXX",
+  "public_ip_alloc_method": "Static",
+  "public_ip_id": "/subscriptions/subscription-id/resourceGroups/galaxy-production/providers/Microsoft.Network/publicIPAddresses/object-name",
+  "public_ip_name": "object-name",
+  "resource_group": "galaxy-production",
+  "security_group": "object-name",
+  "security_group_id": "/subscriptions/subscription-id/resourceGroups/galaxy-production/providers/Microsoft.Network/networkSecurityGroups/object-name",
+  "tags": {
+      "db": "database"
+  },
+  "type": "Microsoft.Compute/virtualMachines",
+  "virtual_machine_size": "Standard_DS4"
+}
+
+Groups
+------
+When run in --list mode, instances are grouped by the following categories:
+ - azure
+ - location
+ - resource_group
+ - security_group
+ - tag key
+ - tag key_value
+
+Control groups using azure_rm.ini or set environment variables:
+
+AZURE_GROUP_BY_RESOURCE_GROUP=yes
+AZURE_GROUP_BY_LOCATION=yes
+AZURE_GROUP_BY_SECURITY_GROUP=yes
+AZURE_GROUP_BY_TAG=yes
+
+Select hosts within specific resource groups by assigning a comma separated list to:
+
+AZURE_RESOURCE_GROUPS=resource_group_a,resource_group_b
+
+Select hosts for specific tag key by assigning a comma separated list of tag keys to:
+
+AZURE_TAGS=key1,key2,key3
+
+Select hosts for specific locations:
+
+AZURE_LOCATIONS=eastus,westus,eastus2
+
+Or, select hosts for specific tag key:value pairs by assigning a comma separated list key:value pairs to:
+
+AZURE_TAGS=key1:value1,key2:value2
+
+If you don't need the powerstate, you can improve performance by turning off powerstate fetching:
+AZURE_INCLUDE_POWERSTATE=no
+
+azure_rm.ini
+------------
+As mentioned above, you can control execution using environment variables or a .ini file. A sample
+azure_rm.ini is included. The name of the .ini file is the basename of the inventory script (in this case
+'azure_rm') with a .ini extension. It also assumes the .ini file is alongside the script. To specify
+a different path for the .ini file, define the AZURE_INI_PATH environment variable:
+
+  export AZURE_INI_PATH=/path/to/custom.ini
+
+Powerstate:
+-----------
+The powerstate attribute indicates whether or not a host is running. If the value is 'running', the machine is
+up. If the value is anything other than 'running', the machine is down, and will be unreachable.
+
+Examples:
+---------
+  Execute /bin/uname on all instances in the galaxy-qa resource group
+  $ ansible -i azure_rm.py galaxy-qa -m shell -a "/bin/uname -a"
+
+  Use the inventory script to print instance specific information
+  $ contrib/inventory/azure_rm.py --host my_instance_host_name --pretty
+
+  Use with a playbook
+  $ ansible-playbook -i contrib/inventory/azure_rm.py my_playbook.yml --limit galaxy-qa
+
+
+Insecure Platform Warning
+-------------------------
+If you receive InsecurePlatformWarning from urllib3, install the
+requests security packages:
+
+    pip install requests[security]
+
+
+author:
+    - Chris Houseknecht (@chouseknecht)
+    - Matt Davis (@nitzmahone)
+
+Company: Ansible by Red Hat
+
+Version: 1.0.0
 '''
 
-EXAMPLES = '''
-# The following host variables are always available:
-# public_ipv4_addresses: all public IP addresses, with the primary IP config from the primary NIC first
-# public_dns_hostnames: all public DNS hostnames, with the primary IP config from the primary NIC first
-# private_ipv4_addresses: all private IP addressses, with the primary IP config from the primary NIC first
-# id: the VM's Azure resource ID, eg /subscriptions/00000000-0000-0000-1111-1111aaaabb/resourceGroups/my_rg/providers/Microsoft.Compute/virtualMachines/my_vm
-# location: the VM's Azure location, eg 'westus', 'eastus'
-# name: the VM's resource name, eg 'myvm'
-# powerstate: the VM's current power state, eg: 'running', 'stopped', 'deallocated'
-# provisioning_state: the VM's current provisioning state, eg: 'succeeded'
-# tags: dictionary of the VM's defined tag values
-# resource_type: the VM's resource type, eg: 'Microsoft.Compute/virtualMachine', 'Microsoft.Compute/virtualMachineScaleSets/virtualMachines'
-# vmid: the VM's internal SMBIOS ID, eg: '36bca69d-c365-4584-8c06-a62f4a1dc5d2'
-# vmss: if the VM is a member of a scaleset (vmss), a dictionary including the id and name of the parent scaleset
-
-
-# sample 'myazuresub.azure_rm.yaml'
-
-# required for all azure_rm inventory plugin configs
-plugin: azure_rm
-
-# forces this plugin to use a CLI auth session instead of the automatic auth source selection (eg, prevents the
-# presence of 'ANSIBLE_AZURE_RM_X' environment variables from overriding CLI auth)
-auth_source: cli
-
-# fetches VMs from an explicit list of resource groups instead of default all (- '*')
-include_vm_resource_groups:
-- myrg1
-- myrg2
-
-# fetches VMs from VMSSs in all resource groups (defaults to no VMSS fetch)
-include_vmss_resource_groups:
-- '*'
-
-# places a host in the named group if the associated condition evaluates to true
-conditional_groups:
-  # since this will be true for every host, every host sourced from this inventory plugin config will be in the
-  # group 'all_the_hosts'
-  all_the_hosts: true
-  # if the VM's "name" variable contains "dbserver", it will be placed in the 'db_hosts' group
-  db_hosts: "'dbserver' in name"
-
-# adds variables to each host found by this inventory plugin, whose values are the result of the associated expression
-hostvar_expressions:
-  my_host_var:
-  # A statically-valued expression has to be both single and double-quoted, or use escaped quotes, since the outer
-  # layer of quotes will be consumed by YAML. Without the second set of quotes, it interprets 'staticvalue' as a
-  # variable instead of a string literal.
-  some_statically_valued_var: "'staticvalue'"
-  # overrides the default ansible_host value with a custom Jinja2 expression, in this case, the first DNS hostname, or
-  # if none are found, the first public IP address.
-  ansible_host: (public_dns_hostnames + public_ipv4_addresses) | first
-
-# places hosts in dynamically-created groups based on a variable value.
-keyed_groups:
-# places each host in a group named 'tag_(tag name)_(tag value)' for each tag on a VM.
-- prefix: tag
-  key: tags
-# places each host in a group named 'azure_loc_(location name)', depending on the VM's location
-- prefix: azure_loc
-  key: location
-# places host in a group named 'some_tag_X' using the value of the 'sometag' tag on a VM as X, and defaulting to the
-# value 'none' (eg, the group 'some_tag_none') if the 'sometag' tag is not defined for a VM.
-- prefix: some_tag
-  key: tags.sometag | default('none')
-
-# excludes a host from the inventory when any of these expressions is true, can refer to any vars defined on the host
-exclude_host_filters:
-# excludes hosts in the eastus region
-- location in ['eastus']
-# excludes hosts that are powered off
-- powerstate != 'running'
-'''
-
-# FUTURE: do we need a set of sane default filters, separate from the user-defineable ones?
-# eg, powerstate==running, provisioning_state==succeeded
-
-
-import hashlib
+import argparse
 import json
+import os
 import re
+import sys
+import inspect
 
 try:
-    from queue import Queue, Empty
+    # python2
+    import ConfigParser as cp
 except ImportError:
-    from Queue import Queue, Empty
+    # python3
+    import configparser as cp
 
-from collections import namedtuple
-from ansible import release
-from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
-from ansible.module_utils.six import iteritems
-from ansible.module_utils.azure_rm_common import AzureRMAuth
-from ansible.errors import AnsibleParserError, AnsibleError
-from ansible.module_utils.parsing.convert_bool import boolean
-from ansible.module_utils._text import to_native, to_bytes
-from itertools import chain
-from msrest import ServiceClient, Serializer, Deserializer
-from msrestazure import AzureConfiguration
-from msrestazure.polling.arm_polling import ARMPolling
+from os.path import expanduser
+import ansible.module_utils.six.moves.urllib.parse as urlparse
+
+HAS_AZURE = True
+HAS_AZURE_EXC = None
+HAS_AZURE_CLI_CORE = True
+CLIError = None
+
+try:
+    from msrestazure.azure_active_directory import AADTokenCredentials
+    from msrestazure.azure_exceptions import CloudError
+    from msrestazure.azure_active_directory import MSIAuthentication
+    from msrestazure import azure_cloud
+    from azure.mgmt.compute import __version__ as azure_compute_version
+    from azure.common import AzureMissingResourceHttpError, AzureHttpError
+    from azure.common.credentials import ServicePrincipalCredentials, UserPassCredentials
+    from azure.mgmt.network import NetworkManagementClient
+    from azure.mgmt.resource.resources import ResourceManagementClient
+    from azure.mgmt.resource.subscriptions import SubscriptionClient
+    from azure.mgmt.compute import ComputeManagementClient
+    from adal.authentication_context import AuthenticationContext
+except ImportError as exc:
+    HAS_AZURE_EXC = exc
+    HAS_AZURE = False
+
+try:
+    from azure.cli.core.util import CLIError
+    from azure.common.credentials import get_azure_cli_credentials, get_cli_profile
+    from azure.common.cloud import get_cli_active_cloud
+except ImportError:
+    HAS_AZURE_CLI_CORE = False
+    CLIError = Exception
+
+try:
+    from ansible.release import __version__ as ansible_version
+except ImportError:
+    ansible_version = 'unknown'
+
+AZURE_CREDENTIAL_ENV_MAPPING = dict(
+    profile='AZURE_PROFILE',
+    subscription_id='AZURE_SUBSCRIPTION_ID',
+    client_id='AZURE_CLIENT_ID',
+    secret='AZURE_SECRET',
+    tenant='AZURE_TENANT',
+    ad_user='AZURE_AD_USER',
+    password='AZURE_PASSWORD',
+    cloud_environment='AZURE_CLOUD_ENVIRONMENT',
+    adfs_authority_url='AZURE_ADFS_AUTHORITY_URL'
+)
+
+AZURE_CONFIG_SETTINGS = dict(
+    resource_groups='AZURE_RESOURCE_GROUPS',
+    tags='AZURE_TAGS',
+    locations='AZURE_LOCATIONS',
+    include_powerstate='AZURE_INCLUDE_POWERSTATE',
+    group_by_resource_group='AZURE_GROUP_BY_RESOURCE_GROUP',
+    group_by_location='AZURE_GROUP_BY_LOCATION',
+    group_by_security_group='AZURE_GROUP_BY_SECURITY_GROUP',
+    group_by_tag='AZURE_GROUP_BY_TAG',
+    group_by_os_family='AZURE_GROUP_BY_OS_FAMILY',
+    use_private_ip='AZURE_USE_PRIVATE_IP'
+)
+
+AZURE_MIN_VERSION = "2.0.0"
+ANSIBLE_USER_AGENT = 'Ansible/{0}'.format(ansible_version)
 
 
-class AzureRMRestConfiguration(AzureConfiguration):
-    def __init__(self, credentials, subscription_id, base_url=None):
-
-        if credentials is None:
-            raise ValueError("Parameter 'credentials' must not be None.")
-        if subscription_id is None:
-            raise ValueError("Parameter 'subscription_id' must not be None.")
-        if not base_url:
-            base_url = 'https://management.azure.com'
-
-        super(AzureRMRestConfiguration, self).__init__(base_url)
-
-        self.add_user_agent('ansible-dynamic-inventory/{0}'.format(release.__version__))
-
-        self.credentials = credentials
-        self.subscription_id = subscription_id
+def azure_id_to_dict(id):
+    pieces = re.sub(r'^\/', '', id).split('/')
+    result = {}
+    index = 0
+    while index < len(pieces) - 1:
+        result[pieces[index]] = pieces[index + 1]
+        index += 1
+    return result
 
 
-UrlAction = namedtuple('UrlAction', ['url', 'api_version', 'handler', 'handler_args'])
+class AzureRM(object):
 
+    def __init__(self, args):
+        self._args = args
+        self._cloud_environment = None
+        self._compute_client = None
+        self._resource_client = None
+        self._network_client = None
+        self._adfs_authority_url = None
+        self._resource = None
 
-# FUTURE: add Cacheable support once we have a sane serialization format
-class InventoryModule(BaseInventoryPlugin, Constructable):
+        self.debug = False
+        if args.debug:
+            self.debug = True
 
-    NAME = 'azure_rm'
+        self.credentials = self._get_credentials(args)
+        if not self.credentials:
+            self.fail("Failed to get credentials. Either pass as parameters, set environment variables, "
+                      "or define a profile in ~/.azure/credentials.")
 
-    def __init__(self):
-        super(InventoryModule, self).__init__()
+        # if cloud_environment specified, look up/build Cloud object
+        raw_cloud_env = self.credentials.get('cloud_environment')
+        if not raw_cloud_env:
+            self._cloud_environment = azure_cloud.AZURE_PUBLIC_CLOUD  # SDK default
+        else:
+            # try to look up "well-known" values via the name attribute on azure_cloud members
+            all_clouds = [x[1] for x in inspect.getmembers(azure_cloud) if isinstance(x[1], azure_cloud.Cloud)]
+            matched_clouds = [x for x in all_clouds if x.name == raw_cloud_env]
+            if len(matched_clouds) == 1:
+                self._cloud_environment = matched_clouds[0]
+            elif len(matched_clouds) > 1:
+                self.fail("Azure SDK failure: more than one cloud matched for cloud_environment name '{0}'".format(raw_cloud_env))
+            else:
+                if not urlparse.urlparse(raw_cloud_env).scheme:
+                    self.fail("cloud_environment must be an endpoint discovery URL or one of {0}".format([x.name for x in all_clouds]))
+                try:
+                    self._cloud_environment = azure_cloud.get_cloud_from_metadata_endpoint(raw_cloud_env)
+                except Exception as e:
+                    self.fail("cloud_environment {0} could not be resolved: {1}".format(raw_cloud_env, e.message))
 
-        self._serializer = Serializer()
-        self._deserializer = Deserializer()
-        self._hosts = []
-        self._filters = None
+        if self.credentials.get('subscription_id', None) is None:
+            self.fail("Credentials did not include a subscription_id value.")
+        self.log("setting subscription_id")
+        self.subscription_id = self.credentials['subscription_id']
 
-        # FUTURE: use API profiles with defaults
-        self._compute_api_version = '2017-03-30'
-        self._network_api_version = '2015-06-15'
+        # get authentication authority
+        # for adfs, user could pass in authority or not.
+        # for others, use default authority from cloud environment
+        if self.credentials.get('adfs_authority_url'):
+            self._adfs_authority_url = self.credentials.get('adfs_authority_url')
+        else:
+            self._adfs_authority_url = self._cloud_environment.endpoints.active_directory
 
-        self._default_header_parameters = {'Content-Type': 'application/json; charset=utf-8'}
+        # get resource from cloud environment
+        self._resource = self._cloud_environment.endpoints.active_directory_resource_id
 
-        self._request_queue = Queue()
+        if self.credentials.get('credentials'):
+            self.azure_credentials = self.credentials.get('credentials')
+        elif self.credentials.get('client_id') and self.credentials.get('secret') and self.credentials.get('tenant'):
+            self.azure_credentials = ServicePrincipalCredentials(client_id=self.credentials['client_id'],
+                                                                 secret=self.credentials['secret'],
+                                                                 tenant=self.credentials['tenant'],
+                                                                 cloud_environment=self._cloud_environment)
 
-        self.azure_auth = None
+        elif self.credentials.get('ad_user') is not None and \
+                self.credentials.get('password') is not None and \
+                self.credentials.get('client_id') is not None and \
+                self.credentials.get('tenant') is not None:
 
-        self._batch_fetch = False
+                self.azure_credentials = self.acquire_token_with_username_password(
+                    self._adfs_authority_url,
+                    self._resource,
+                    self.credentials['ad_user'],
+                    self.credentials['password'],
+                    self.credentials['client_id'],
+                    self.credentials['tenant'])
 
-    def verify_file(self, path):
-        '''
-            :param loader: an ansible.parsing.dataloader.DataLoader object
-            :param path: the path to the inventory config file
-            :return the contents of the config file
-        '''
-        if super(InventoryModule, self).verify_file(path):
-            if re.match(r'.{0,}azure_rm\.y(a)?ml$', path):
-                return True
-        # display.debug("azure_rm inventory filename must end with 'azure_rm.yml' or 'azure_rm.yaml'")
-        return False
+        elif self.credentials.get('ad_user') is not None and self.credentials.get('password') is not None:
+            tenant = self.credentials.get('tenant')
+            if not tenant:
+                tenant = 'common'
+            self.azure_credentials = UserPassCredentials(self.credentials['ad_user'],
+                                                         self.credentials['password'],
+                                                         tenant=tenant,
+                                                         cloud_environment=self._cloud_environment)
 
-    def parse(self, inventory, loader, path, cache=True):
-        super(InventoryModule, self).parse(inventory, loader, path)
+        else:
+            self.fail("Failed to authenticate with provided credentials. Some attributes were missing. "
+                      "Credentials must include client_id, secret and tenant or ad_user and password, or "
+                      "ad_user, password, client_id, tenant and adfs_authority_url(optional) for ADFS authentication, or "
+                      "be logged in using AzureCLI.")
 
-        self._read_config_data(path)
-        self._batch_fetch = self.get_option('batch_fetch')
+    def log(self, msg):
+        if self.debug:
+            print(msg + u'\n')
 
-        self._filters = self.get_option('exclude_host_filters') + self.get_option('default_host_filters')
+    def fail(self, msg):
+        raise Exception(msg)
 
+    def _get_profile(self, profile="default"):
+        path = expanduser("~")
+        path += "/.azure/credentials"
         try:
-            self._credential_setup()
-            self._get_hosts()
-        except Exception as ex:
-            raise
-
-    def _credential_setup(self):
-        auth_options = dict(
-            auth_source=self.get_option('auth_source'),
-            profile=self.get_option('profile'),
-            subscription_id=self.get_option('subscription_id'),
-            client_id=self.get_option('client_id'),
-            secret=self.get_option('secret'),
-            tenant=self.get_option('tenant'),
-            ad_user=self.get_option('ad_user'),
-            password=self.get_option('password'),
-            cloud_environment=self.get_option('cloud_environment'),
-            cert_validation_mode=self.get_option('cert_validation_mode'),
-            api_profile=self.get_option('api_profile'),
-            adfs_authority_url=self.get_option('adfs_authority_url')
-        )
-
-        self.azure_auth = AzureRMAuth(**auth_options)
-
-        self._clientconfig = AzureRMRestConfiguration(self.azure_auth.azure_credentials, self.azure_auth.subscription_id,
-                                                      self.azure_auth._cloud_environment.endpoints.resource_manager)
-        self._client = ServiceClient(self._clientconfig.credentials, self._clientconfig)
-
-    def _enqueue_get(self, url, api_version, handler, handler_args=None):
-        if not handler_args:
-            handler_args = {}
-        self._request_queue.put_nowait(UrlAction(url=url, api_version=api_version, handler=handler, handler_args=handler_args))
-
-    def _enqueue_vm_list(self, rg='*'):
-        if not rg or rg == '*':
-            url = '/subscriptions/{subscriptionId}/providers/Microsoft.Compute/virtualMachines'
-        else:
-            url = '/subscriptions/{subscriptionId}/resourceGroups/{rg}/providers/Microsoft.Compute/virtualMachines'
-
-        url = url.format(subscriptionId=self._clientconfig.subscription_id, rg=rg)
-        self._enqueue_get(url=url, api_version=self._compute_api_version, handler=self._on_vm_page_response)
-
-    def _enqueue_vmss_list(self, rg=None):
-        if not rg or rg == '*':
-            url = '/subscriptions/{subscriptionId}/providers/Microsoft.Compute/virtualMachineScaleSets'
-        else:
-            url = '/subscriptions/{subscriptionId}/resourceGroups/{rg}/providers/Microsoft.Compute/virtualMachineScaleSets'
-
-        url = url.format(subscriptionId=self._clientconfig.subscription_id, rg=rg)
-        self._enqueue_get(url=url, api_version=self._compute_api_version, handler=self._on_vmss_page_response)
-
-    def _get_hosts(self):
-        for vm_rg in self.get_option('include_vm_resource_groups'):
-            self._enqueue_vm_list(vm_rg)
-
-        for vmss_rg in self.get_option('include_vmss_resource_groups'):
-            self._enqueue_vmss_list(vmss_rg)
-
-        if self._batch_fetch:
-            self._process_queue_batch()
-        else:
-            self._process_queue_serial()
-
-        constructable_config_strict = boolean(self.get_option('fail_on_template_errors'))
-        constructable_config_compose = self.get_option('hostvar_expressions')
-        constructable_config_groups = self.get_option('conditional_groups')
-        constructable_config_keyed_groups = self.get_option('keyed_groups')
-
-        for h in self._hosts:
-            inventory_hostname = self._get_hostname(h)
-            if self._filter_host(inventory_hostname, h.hostvars):
-                continue
-            self.inventory.add_host(inventory_hostname)
-            # FUTURE: configurable default IP list? can already do this via hostvar_expressions
-            self.inventory.set_variable(inventory_hostname, "ansible_host",
-                                        next(chain(h.hostvars['public_ipv4_addresses'], h.hostvars['private_ipv4_addresses']), None))
-            for k, v in iteritems(h.hostvars):
-                # FUTURE: configurable hostvar prefix? Makes docs harder...
-                self.inventory.set_variable(inventory_hostname, k, v)
-
-            # constructable delegation
-            self._set_composite_vars(constructable_config_compose, h.hostvars, inventory_hostname, strict=constructable_config_strict)
-            self._add_host_to_composed_groups(constructable_config_groups, h.hostvars, inventory_hostname, strict=constructable_config_strict)
-            self._add_host_to_keyed_groups(constructable_config_keyed_groups, h.hostvars, inventory_hostname, strict=constructable_config_strict)
-
-    # FUTURE: fix underlying inventory stuff to allow us to quickly access known groupvars from reconciled host
-    def _filter_host(self, inventory_hostname, hostvars):
-        self.templar.set_available_variables(hostvars)
-
-        for condition in self._filters:
-            # FUTURE: should warn/fail if conditional doesn't return True or False
-            conditional = "{{% if {0} %}} True {{% else %}} False {{% endif %}}".format(condition)
+            config = cp.ConfigParser()
+            config.read(path)
+        except Exception as exc:
+            self.fail("Failed to access {0}. Check that the file exists and you have read "
+                      "access. {1}".format(path, str(exc)))
+        credentials = dict()
+        for key in AZURE_CREDENTIAL_ENV_MAPPING:
             try:
-                if boolean(self.templar.template(conditional)):
-                    return True
-            except Exception as e:
-                if boolean(self.get_option('fail_on_template_errors')):
-                    raise AnsibleParserError("Error evaluating filter condition '{0}' for host {1}: {2}".format(condition, inventory_hostname, to_native(e)))
-                continue
-
-        return False
-
-    def _get_hostname(self, host):
-        # FUTURE: configurable hostname sources
-        return host.default_inventory_hostname
-
-    def _process_queue_serial(self):
-        try:
-            while True:
-                item = self._request_queue.get_nowait()
-                resp = self.send_request(item.url, item.api_version)
-                item.handler(resp, **item.handler_args)
-        except Empty:
-            pass
-
-    def _on_vm_page_response(self, response, vmss=None):
-        next_link = response.get('nextLink')
-
-        if next_link:
-            self._enqueue_get(url=next_link, api_version=self._compute_api_version, handler=self._on_vm_page_response)
-
-        for h in response['value']:
-            # FUTURE: add direct VM filtering by tag here (performance optimization)?
-            self._hosts.append(AzureHost(h, self, vmss=vmss))
-
-    def _on_vmss_page_response(self, response):
-        next_link = response.get('nextLink')
-
-        if next_link:
-            self._enqueue_get(url=next_link, api_version=self._compute_api_version, handler=self._on_vmss_page_response)
-
-        # FUTURE: add direct VMSS filtering by tag here (performance optimization)?
-        for vmss in response['value']:
-            url = '{0}/virtualMachines'.format(vmss['id'])
-            # VMSS instances look close enough to regular VMs that we can share the handler impl...
-            self._enqueue_get(url=url, api_version=self._compute_api_version, handler=self._on_vm_page_response, handler_args=dict(vmss=vmss))
-
-    # use the undocumented /batch endpoint to bulk-send up to 500 requests in a single round-trip
-    #
-    def _process_queue_batch(self):
-        while True:
-            batch_requests = []
-            batch_item_index = 0
-            batch_response_handlers = []
-            try:
-                while batch_item_index < 500:
-                    item = self._request_queue.get_nowait()
-
-                    query_parameters = {'api-version': item.api_version}
-                    req = self._client.get(item.url, query_parameters)
-
-                    batch_requests.append(dict(httpMethod="GET", url=req.url))
-                    batch_response_handlers.append(item)
-                    batch_item_index += 1
-            except Empty:
+                credentials[key] = config.get(profile, key, raw=True)
+            except:
                 pass
 
-            if not batch_requests:
-                break
+        if credentials.get('client_id') is not None or credentials.get('ad_user') is not None:
+            return credentials
 
-            batch_resp = self._send_batch(batch_requests)
+        return None
 
-            for idx, r in enumerate(batch_resp['responses']):
-                status_code = r.get('httpStatusCode')
-                if status_code != 200:
-                    # FUTURE: error-tolerant operation mode (eg, permissions)
-                    raise AnsibleError("a batched request failed with status code {0}, url {1}".format(status_code, batch_requests[idx].get('url')))
+    def _get_env_credentials(self):
+        env_credentials = dict()
+        for attribute, env_variable in AZURE_CREDENTIAL_ENV_MAPPING.items():
+            env_credentials[attribute] = os.environ.get(env_variable, None)
 
-                item = batch_response_handlers[idx]
-                # FUTURE: store/handle errors from individual handlers
-                item.handler(r['content'], **item.handler_args)
+        if env_credentials['profile'] is not None:
+            credentials = self._get_profile(env_credentials['profile'])
+            return credentials
 
-    def _send_batch(self, batched_requests):
-        url = '/batch'
-        query_parameters = {'api-version': '2015-11-01'}
+        if env_credentials['client_id'] is not None or env_credentials['ad_user'] is not None:
+            return env_credentials
 
-        body_obj = dict(requests=batched_requests)
+        return None
 
-        body_content = self._serializer.body(body_obj, 'object')
+    def _get_azure_cli_credentials(self):
+        credentials, subscription_id = get_azure_cli_credentials()
+        cloud_environment = get_cli_active_cloud()
 
-        request = self._client.post(url, query_parameters)
-        initial_response = self._client.send(request, self._default_header_parameters, body_content)
+        cli_credentials = {
+            'credentials': credentials,
+            'subscription_id': subscription_id,
+            'cloud_environment': cloud_environment
+        }
+        return cli_credentials
 
-        # FUTURE: configurable timeout?
-        poller = ARMPolling(timeout=2)
-        poller.initialize(client=self._client,
-                          initial_response=initial_response,
-                          deserialization_callback=lambda r: self._deserializer('object', r))
+    def _get_msi_credentials(self, subscription_id_param=None):
+        credentials = MSIAuthentication()
+        subscription_id_param = subscription_id_param or os.environ.get(AZURE_CREDENTIAL_ENV_MAPPING['subscription_id'], None)
+        try:
+            # try to get the subscription in MSI to test whether MSI is enabled
+            subscription_client = SubscriptionClient(credentials)
+            subscription = next(subscription_client.subscriptions.list())
+            subscription_id = str(subscription.subscription_id)
+            return {
+                'credentials': credentials,
+                'subscription_id': subscription_id_param or subscription_id
+            }
+        except Exception as exc:
+            return None
 
-        poller.run()
+    def _get_credentials(self, params):
+        # Get authentication credentials.
+        # Precedence: cmd line parameters-> environment variables-> default profile in ~/.azure/credentials.
 
-        return poller.resource()
+        self.log('Getting credentials')
 
-    def send_request(self, url, api_version):
-        query_parameters = {'api-version': api_version}
-        req = self._client.get(url, query_parameters)
-        resp = self._client.send(req, self._default_header_parameters, stream=False)
+        arg_credentials = dict()
+        for attribute, env_variable in AZURE_CREDENTIAL_ENV_MAPPING.items():
+            arg_credentials[attribute] = getattr(params, attribute)
 
-        resp.raise_for_status()
-        content = resp.content
+        # try module params
+        if arg_credentials['profile'] is not None:
+            self.log('Retrieving credentials with profile parameter.')
+            credentials = self._get_profile(arg_credentials['profile'])
+            return credentials
 
-        return json.loads(content)
+        if arg_credentials['client_id'] is not None:
+            self.log('Received credentials from parameters.')
+            return arg_credentials
 
+        if arg_credentials['ad_user'] is not None:
+            self.log('Received credentials from parameters.')
+            return arg_credentials
 
-# VM list (all, N resource groups): VM -> InstanceView, N NICs, N PublicIPAddress)
-# VMSS VMs (all SS, N specific SS, N resource groups?): SS -> VM -> InstanceView, N NICs, N PublicIPAddress)
+        # try environment
+        env_credentials = self._get_env_credentials()
+        if env_credentials:
+            self.log('Received credentials from env.')
+            return env_credentials
 
-class AzureHost(object):
-    _powerstate_regex = re.compile('^PowerState/(?P<powerstate>.+)$')
+        # try default profile from ~./azure/credentials
+        default_credentials = self._get_profile()
+        if default_credentials:
+            self.log('Retrieved default profile credentials from ~/.azure/credentials.')
+            return default_credentials
 
-    def __init__(self, vm_model, inventory_client, vmss=None):
-        self._inventory_client = inventory_client
-        self._vm_model = vm_model
-        self._vmss = vmss
+        msi_credentials = self._get_msi_credentials(arg_credentials.get('subscription_id'))
+        if msi_credentials:
+            self.log('Retrieved credentials from MSI.')
+            return msi_credentials
 
-        self._instanceview = None
+        try:
+            if HAS_AZURE_CLI_CORE:
+                self.log('Retrieving credentials from AzureCLI profile')
+            cli_credentials = self._get_azure_cli_credentials()
+            return cli_credentials
+        except CLIError as ce:
+            self.log('Error getting AzureCLI profile credentials - {0}'.format(ce))
 
-        self._powerstate = "unknown"
-        self.nics = []
+        return None
 
-        # Azure often doesn't provide a globally-unique filename, so use resource name + a chunk of ID hash
-        self.default_inventory_hostname = '{0}_{1}'.format(vm_model['name'], hashlib.sha1(to_bytes(vm_model['id'])).hexdigest()[0:4])
+    def acquire_token_with_username_password(self, authority, resource, username, password, client_id, tenant):
+        authority_uri = authority
 
-        self._hostvars = {}
+        if tenant is not None:
+            authority_uri = authority + '/' + tenant
 
-        inventory_client._enqueue_get(url="{0}/instanceView".format(vm_model['id']),
-                                      api_version=self._inventory_client._compute_api_version,
-                                      handler=self._on_instanceview_response)
+        context = AuthenticationContext(authority_uri)
+        token_response = context.acquire_token_with_username_password(resource, username, password, client_id)
+        return AADTokenCredentials(token_response)
 
-        nic_refs = vm_model['properties']['networkProfile']['networkInterfaces']
-        for nic in nic_refs:
-            # single-nic instances don't set primary, so figure it out...
-            is_primary = nic.get('properties', {}).get('primary', len(nic_refs) == 1)
-            inventory_client._enqueue_get(url=nic['id'], api_version=self._inventory_client._network_api_version,
-                                          handler=self._on_nic_response,
-                                          handler_args=dict(is_primary=is_primary))
+    def _register(self, key):
+        try:
+            # We have to perform the one-time registration here. Otherwise, we receive an error the first
+            # time we attempt to use the requested client.
+            resource_client = self.rm_client
+            resource_client.providers.register(key)
+        except Exception as exc:
+            self.log("One-time registration of {0} failed - {1}".format(key, str(exc)))
+            self.log("You might need to register {0} using an admin account".format(key))
+            self.log(("To register a provider using the Python CLI: "
+                      "https://docs.microsoft.com/azure/azure-resource-manager/"
+                      "resource-manager-common-deployment-errors#noregisteredproviderfound"))
+
+    def get_mgmt_svc_client(self, client_type, base_url, api_version):
+        client = client_type(self.azure_credentials,
+                             self.subscription_id,
+                             base_url=base_url,
+                             api_version=api_version)
+        client.config.add_user_agent(ANSIBLE_USER_AGENT)
+        return client
 
     @property
-    def hostvars(self):
-        if self._hostvars != {}:
-            return self._hostvars
+    def network_client(self):
+        self.log('Getting network client')
+        if not self._network_client:
+            self._network_client = self.get_mgmt_svc_client(NetworkManagementClient,
+                                                            self._cloud_environment.endpoints.resource_manager,
+                                                            '2017-06-01')
+            self._register('Microsoft.Network')
+        return self._network_client
 
-        new_hostvars = dict(
-            public_ipv4_addresses=[],
-            public_dns_hostnames=[],
-            private_ipv4_addresses=[],
-            id=self._vm_model['id'],
-            location=self._vm_model['location'],
-            name=self._vm_model['name'],
-            powerstate=self._powerstate,
-            provisioning_state=self._vm_model['properties']['provisioningState'].lower(),
-            tags=self._vm_model.get('tags', {}),
-            resource_type=self._vm_model.get('type', "unknown"),
-            vmid=self._vm_model['properties']['vmId'],
-            vmss=dict(
-                id=self._vmss['id'],
-                name=self._vmss['name'],
-            ) if self._vmss else {}
+    @property
+    def rm_client(self):
+        self.log('Getting resource manager client')
+        if not self._resource_client:
+            self._resource_client = self.get_mgmt_svc_client(ResourceManagementClient,
+                                                             self._cloud_environment.endpoints.resource_manager,
+                                                             '2017-05-10')
+        return self._resource_client
+
+    @property
+    def compute_client(self):
+        self.log('Getting compute client')
+        if not self._compute_client:
+            self._compute_client = self.get_mgmt_svc_client(ComputeManagementClient,
+                                                            self._cloud_environment.endpoints.resource_manager,
+                                                            '2017-03-30')
+            self._register('Microsoft.Compute')
+        return self._compute_client
+
+
+class AzureInventory(object):
+
+    def __init__(self):
+
+        self._args = self._parse_cli_args()
+
+        try:
+            rm = AzureRM(self._args)
+        except Exception as e:
+            sys.exit("{0}".format(str(e)))
+
+        self._compute_client = rm.compute_client
+        self._network_client = rm.network_client
+        self._resource_client = rm.rm_client
+        self._security_groups = None
+
+        self.resource_groups = []
+        self.tags = None
+        self.locations = None
+        self.replace_dash_in_groups = False
+        self.group_by_resource_group = True
+        self.group_by_location = True
+        self.group_by_os_family = True
+        self.group_by_security_group = True
+        self.group_by_tag = True
+        self.include_powerstate = True
+        self.use_private_ip = False
+
+        self._inventory = dict(
+            _meta=dict(
+                hostvars=dict()
+            ),
+            azure=[]
         )
 
-        # set nic-related values from the primary NIC first
-        for nic in sorted(self.nics, key=lambda n: n.is_primary, reverse=True):
-            # and from the primary IP config per NIC first
-            for ipc in sorted(nic._nic_model['properties']['ipConfigurations'], key=lambda i: i['properties']['primary'], reverse=True):
-                private_ip = ipc['properties'].get('privateIPAddress')
-                if private_ip:
-                    new_hostvars['private_ipv4_addresses'].append(private_ip)
-                pip_id = ipc['properties'].get('publicIPAddress', {}).get('id')
-                if pip_id:
-                    pip = nic.public_ips[pip_id]
-                    new_hostvars['public_ipv4_addresses'].append(pip._pip_model['properties']['ipAddress'])
-                    pip_fqdn = pip._pip_model['properties'].get('dnsSettings', {}).get('fqdn')
-                    if pip_fqdn:
-                        new_hostvars['public_dns_hostnames'].append(pip_fqdn)
+        self._get_settings()
 
-        self._hostvars = new_hostvars
+        if self._args.resource_groups:
+            self.resource_groups = self._args.resource_groups.split(',')
 
-        return self._hostvars
+        if self._args.tags:
+            self.tags = self._args.tags.split(',')
 
-    def _on_instanceview_response(self, vm_instanceview_model):
-        self._instanceview = vm_instanceview_model
-        self._powerstate = next((self._powerstate_regex.match(s.get('code', '')).group('powerstate')
-                                 for s in vm_instanceview_model.get('statuses', []) if self._powerstate_regex.match(s.get('code', ''))), 'unknown')
+        if self._args.locations:
+            self.locations = self._args.locations.split(',')
 
-    def _on_nic_response(self, nic_model, is_primary=False):
-        nic = AzureNic(nic_model=nic_model, inventory_client=self._inventory_client, is_primary=is_primary)
-        self.nics.append(nic)
+        if self._args.no_powerstate:
+            self.include_powerstate = False
+
+        self.get_inventory()
+        print(self._json_format_dict(pretty=self._args.pretty))
+        sys.exit(0)
+
+    def _parse_cli_args(self):
+        # Parse command line arguments
+        parser = argparse.ArgumentParser(
+            description='Produce an Ansible Inventory file for an Azure subscription')
+        parser.add_argument('--list', action='store_true', default=True,
+                            help='List instances (default: True)')
+        parser.add_argument('--debug', action='store_true', default=False,
+                            help='Send debug messages to STDOUT')
+        parser.add_argument('--host', action='store',
+                            help='Get all information about an instance')
+        parser.add_argument('--pretty', action='store_true', default=False,
+                            help='Pretty print JSON output(default: False)')
+        parser.add_argument('--profile', action='store',
+                            help='Azure profile contained in ~/.azure/credentials')
+        parser.add_argument('--subscription_id', action='store',
+                            help='Azure Subscription Id')
+        parser.add_argument('--client_id', action='store',
+                            help='Azure Client Id ')
+        parser.add_argument('--secret', action='store',
+                            help='Azure Client Secret')
+        parser.add_argument('--tenant', action='store',
+                            help='Azure Tenant Id')
+        parser.add_argument('--ad_user', action='store',
+                            help='Active Directory User')
+        parser.add_argument('--password', action='store',
+                            help='password')
+        parser.add_argument('--adfs_authority_url', action='store',
+                            help='Azure ADFS authority url')
+        parser.add_argument('--cloud_environment', action='store',
+                            help='Azure Cloud Environment name or metadata discovery URL')
+        parser.add_argument('--resource-groups', action='store',
+                            help='Return inventory for comma separated list of resource group names')
+        parser.add_argument('--tags', action='store',
+                            help='Return inventory for comma separated list of tag key:value pairs')
+        parser.add_argument('--locations', action='store',
+                            help='Return inventory for comma separated list of locations')
+        parser.add_argument('--no-powerstate', action='store_true', default=False,
+                            help='Do not include the power state of each virtual host')
+        return parser.parse_args()
+
+    def get_inventory(self):
+        if len(self.resource_groups) > 0:
+            # get VMs for requested resource groups
+            for resource_group in self.resource_groups:
+                try:
+                    virtual_machines = self._compute_client.virtual_machines.list(resource_group.lower())
+                except Exception as exc:
+                    sys.exit("Error: fetching virtual machines for resource group {0} - {1}".format(resource_group, str(exc)))
+                if self._args.host or self.tags:
+                    selected_machines = self._selected_machines(virtual_machines)
+                    self._load_machines(selected_machines)
+                else:
+                    self._load_machines(virtual_machines)
+        else:
+            # get all VMs within the subscription
+            try:
+                virtual_machines = self._compute_client.virtual_machines.list_all()
+            except Exception as exc:
+                sys.exit("Error: fetching virtual machines - {0}".format(str(exc)))
+
+            if self._args.host or self.tags or self.locations:
+                selected_machines = self._selected_machines(virtual_machines)
+                self._load_machines(selected_machines)
+            else:
+                self._load_machines(virtual_machines)
+
+    def _load_machines(self, machines):
+        for machine in machines:
+            id_dict = azure_id_to_dict(machine.id)
+
+            # TODO - The API is returning an ID value containing resource group name in ALL CAPS. If/when it gets
+            #       fixed, we should remove the .lower(). Opened Issue
+            #       #574: https://github.com/Azure/azure-sdk-for-python/issues/574
+            resource_group = id_dict['resourceGroups'].lower()
+
+            if self.group_by_security_group:
+                self._get_security_groups(resource_group)
+
+            host_vars = dict(
+                ansible_host=None,
+                private_ip=None,
+                private_ip_alloc_method=None,
+                public_ip=None,
+                public_ip_name=None,
+                public_ip_id=None,
+                public_ip_alloc_method=None,
+                fqdn=None,
+                location=machine.location,
+                name=machine.name,
+                type=machine.type,
+                id=machine.id,
+                tags=machine.tags,
+                network_interface_id=None,
+                network_interface=None,
+                resource_group=resource_group,
+                mac_address=None,
+                plan=(machine.plan.name if machine.plan else None),
+                virtual_machine_size=machine.hardware_profile.vm_size,
+                computer_name=(machine.os_profile.computer_name if machine.os_profile else None),
+                provisioning_state=machine.provisioning_state,
+            )
+
+            host_vars['os_disk'] = dict(
+                name=machine.storage_profile.os_disk.name,
+                operating_system_type=machine.storage_profile.os_disk.os_type.value.lower()
+            )
+
+            if self.include_powerstate:
+                host_vars['powerstate'] = self._get_powerstate(resource_group, machine.name)
+
+            if machine.storage_profile.image_reference:
+                host_vars['image'] = dict(
+                    offer=machine.storage_profile.image_reference.offer,
+                    publisher=machine.storage_profile.image_reference.publisher,
+                    sku=machine.storage_profile.image_reference.sku,
+                    version=machine.storage_profile.image_reference.version
+                )
+
+            # Add windows details
+            if machine.os_profile is not None and machine.os_profile.windows_configuration is not None:
+                host_vars['ansible_connection'] = 'winrm'
+                host_vars['windows_auto_updates_enabled'] = \
+                    machine.os_profile.windows_configuration.enable_automatic_updates
+                host_vars['windows_timezone'] = machine.os_profile.windows_configuration.time_zone
+                host_vars['windows_rm'] = None
+                if machine.os_profile.windows_configuration.win_rm is not None:
+                    host_vars['windows_rm'] = dict(listeners=None)
+                    if machine.os_profile.windows_configuration.win_rm.listeners is not None:
+                        host_vars['windows_rm']['listeners'] = []
+                        for listener in machine.os_profile.windows_configuration.win_rm.listeners:
+                            host_vars['windows_rm']['listeners'].append(dict(protocol=listener.protocol.name,
+                                                                             certificate_url=listener.certificate_url))
+
+            for interface in machine.network_profile.network_interfaces:
+                interface_reference = self._parse_ref_id(interface.id)
+                network_interface = self._network_client.network_interfaces.get(
+                    interface_reference['resourceGroups'],
+                    interface_reference['networkInterfaces'])
+                if network_interface.primary:
+                    if self.group_by_security_group and \
+                       self._security_groups[resource_group].get(network_interface.id, None):
+                        host_vars['security_group'] = \
+                            self._security_groups[resource_group][network_interface.id]['name']
+                        host_vars['security_group_id'] = \
+                            self._security_groups[resource_group][network_interface.id]['id']
+                    host_vars['network_interface'] = network_interface.name
+                    host_vars['network_interface_id'] = network_interface.id
+                    host_vars['mac_address'] = network_interface.mac_address
+                    for ip_config in network_interface.ip_configurations:
+                        host_vars['private_ip'] = ip_config.private_ip_address
+                        host_vars['private_ip_alloc_method'] = ip_config.private_ip_allocation_method
+                        if self.use_private_ip:
+                            host_vars['ansible_host'] = ip_config.private_ip_address
+                        if ip_config.public_ip_address:
+                            public_ip_reference = self._parse_ref_id(ip_config.public_ip_address.id)
+                            public_ip_address = self._network_client.public_ip_addresses.get(
+                                public_ip_reference['resourceGroups'],
+                                public_ip_reference['publicIPAddresses'])
+                            if not self.use_private_ip:
+                                host_vars['ansible_host'] = public_ip_address.ip_address
+                            host_vars['public_ip'] = public_ip_address.ip_address
+                            host_vars['public_ip_name'] = public_ip_address.name
+                            host_vars['public_ip_alloc_method'] = public_ip_address.public_ip_allocation_method
+                            host_vars['public_ip_id'] = public_ip_address.id
+                            if public_ip_address.dns_settings:
+                                host_vars['fqdn'] = public_ip_address.dns_settings.fqdn
+
+            self._add_host(host_vars)
+
+    def _selected_machines(self, virtual_machines):
+        selected_machines = []
+        for machine in virtual_machines:
+            if self._args.host and self._args.host == machine.name:
+                selected_machines.append(machine)
+            if self.tags and self._tags_match(machine.tags, self.tags):
+                selected_machines.append(machine)
+            if self.locations and machine.location in self.locations:
+                selected_machines.append(machine)
+        return selected_machines
+
+    def _get_security_groups(self, resource_group):
+        ''' For a given resource_group build a mapping of network_interface.id to security_group name '''
+        if not self._security_groups:
+            self._security_groups = dict()
+        if not self._security_groups.get(resource_group):
+            self._security_groups[resource_group] = dict()
+            for group in self._network_client.network_security_groups.list(resource_group):
+                if group.network_interfaces:
+                    for interface in group.network_interfaces:
+                        self._security_groups[resource_group][interface.id] = dict(
+                            name=group.name,
+                            id=group.id
+                        )
+
+    def _get_powerstate(self, resource_group, name):
+        try:
+            vm = self._compute_client.virtual_machines.get(resource_group,
+                                                           name,
+                                                           expand='instanceview')
+        except Exception as exc:
+            sys.exit("Error: fetching instanceview for host {0} - {1}".format(name, str(exc)))
+
+        return next((s.code.replace('PowerState/', '')
+                    for s in vm.instance_view.statuses if s.code.startswith('PowerState')), None)
+
+    def _add_host(self, vars):
+
+        host_name = self._to_safe(vars['name'])
+        resource_group = self._to_safe(vars['resource_group'])
+        operating_system_type = self._to_safe(vars['os_disk']['operating_system_type'].lower())
+        security_group = None
+        if vars.get('security_group'):
+            security_group = self._to_safe(vars['security_group'])
+
+        if self.group_by_os_family:
+            if not self._inventory.get(operating_system_type):
+                self._inventory[operating_system_type] = []
+            self._inventory[operating_system_type].append(host_name)
+
+        if self.group_by_resource_group:
+            if not self._inventory.get(resource_group):
+                self._inventory[resource_group] = []
+            self._inventory[resource_group].append(host_name)
+
+        if self.group_by_location:
+            if not self._inventory.get(vars['location']):
+                self._inventory[vars['location']] = []
+            self._inventory[vars['location']].append(host_name)
+
+        if self.group_by_security_group and security_group:
+            if not self._inventory.get(security_group):
+                self._inventory[security_group] = []
+            self._inventory[security_group].append(host_name)
+
+        self._inventory['_meta']['hostvars'][host_name] = vars
+        self._inventory['azure'].append(host_name)
+
+        if self.group_by_tag and vars.get('tags'):
+            for key, value in vars['tags'].items():
+                safe_key = self._to_safe(key)
+                safe_value = safe_key + '_' + self._to_safe(value)
+                if not self._inventory.get(safe_key):
+                    self._inventory[safe_key] = []
+                if not self._inventory.get(safe_value):
+                    self._inventory[safe_value] = []
+                self._inventory[safe_key].append(host_name)
+                self._inventory[safe_value].append(host_name)
+
+    def _json_format_dict(self, pretty=False):
+        # convert inventory to json
+        if pretty:
+            return json.dumps(self._inventory, sort_keys=True, indent=2)
+        else:
+            return json.dumps(self._inventory)
+
+    def _get_settings(self):
+        # Load settings from the .ini, if it exists. Otherwise,
+        # look for environment values.
+        file_settings = self._load_settings()
+        if file_settings:
+            for key in AZURE_CONFIG_SETTINGS:
+                if key in ('resource_groups', 'tags', 'locations') and file_settings.get(key):
+                    values = file_settings.get(key).split(',')
+                    if len(values) > 0:
+                        setattr(self, key, values)
+                elif file_settings.get(key):
+                    val = self._to_boolean(file_settings[key])
+                    setattr(self, key, val)
+        else:
+            env_settings = self._get_env_settings()
+            for key in AZURE_CONFIG_SETTINGS:
+                if key in('resource_groups', 'tags', 'locations') and env_settings.get(key):
+                    values = env_settings.get(key).split(',')
+                    if len(values) > 0:
+                        setattr(self, key, values)
+                elif env_settings.get(key, None) is not None:
+                    val = self._to_boolean(env_settings[key])
+                    setattr(self, key, val)
+
+    def _parse_ref_id(self, reference):
+        response = {}
+        keys = reference.strip('/').split('/')
+        for index in range(len(keys)):
+            if index < len(keys) - 1 and index % 2 == 0:
+                response[keys[index]] = keys[index + 1]
+        return response
+
+    def _to_boolean(self, value):
+        if value in ['Yes', 'yes', 1, 'True', 'true', True]:
+            result = True
+        elif value in ['No', 'no', 0, 'False', 'false', False]:
+            result = False
+        else:
+            result = True
+        return result
+
+    def _get_env_settings(self):
+        env_settings = dict()
+        for attribute, env_variable in AZURE_CONFIG_SETTINGS.items():
+            env_settings[attribute] = os.environ.get(env_variable, None)
+        return env_settings
+
+    def _load_settings(self):
+        basename = os.path.splitext(os.path.basename(__file__))[0]
+        default_path = os.path.join(os.path.dirname(__file__), (basename + '.ini'))
+        path = os.path.expanduser(os.path.expandvars(os.environ.get('AZURE_INI_PATH', default_path)))
+        config = None
+        settings = None
+        try:
+            config = cp.ConfigParser()
+            config.read(path)
+        except:
+            pass
+
+        if config is not None:
+            settings = dict()
+            for key in AZURE_CONFIG_SETTINGS:
+                try:
+                    settings[key] = config.get('azure', key, raw=True)
+                except:
+                    pass
+
+        return settings
+
+    def _tags_match(self, tag_obj, tag_args):
+        '''
+        Return True if the tags object from a VM contains the requested tag values.
+
+        :param tag_obj:  Dictionary of string:string pairs
+        :param tag_args: List of strings in the form key=value
+        :return: boolean
+        '''
+
+        if not tag_obj:
+            return False
+
+        matches = 0
+        for arg in tag_args:
+            arg_key = arg
+            arg_value = None
+            if re.search(r':', arg):
+                arg_key, arg_value = arg.split(':')
+            if arg_value and tag_obj.get(arg_key, None) == arg_value:
+                matches += 1
+            elif not arg_value and tag_obj.get(arg_key, None) is not None:
+                matches += 1
+        if matches == len(tag_args):
+            return True
+        return False
+
+    def _to_safe(self, word):
+        ''' Converts 'bad' characters in a string to underscores so they can be used as Ansible groups '''
+        regex = r"[^A-Za-z0-9\_"
+        if not self.replace_dash_in_groups:
+            regex += r"\-"
+        return re.sub(regex + "]", "_", word)
 
 
-class AzureNic(object):
-    def __init__(self, nic_model, inventory_client, is_primary=False):
-        self._nic_model = nic_model
-        self.is_primary = is_primary
-        self._inventory_client = inventory_client
+def main():
+    if not HAS_AZURE:
+        sys.exit("The Azure python sdk is not installed (try `pip install 'azure>={0}' --upgrade`) - {1}".format(AZURE_MIN_VERSION, HAS_AZURE_EXC))
 
-        self.public_ips = {}
-
-        for ipc in nic_model['properties']['ipConfigurations']:
-            pip = ipc['properties'].get('publicIPAddress')
-            if pip:
-                self._inventory_client._enqueue_get(url=pip['id'], api_version=self._inventory_client._network_api_version, handler=self._on_pip_response)
-
-    def _on_pip_response(self, pip_model):
-        self.public_ips[pip_model['id']] = AzurePip(pip_model)
+    AzureInventory()
 
 
-class AzurePip(object):
-    def __init__(self, pip_model):
-        self._pip_model = pip_model
+if __name__ == '__main__':
+    main()
