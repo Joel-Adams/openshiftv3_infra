@@ -3,9 +3,6 @@
 # Common Packages
 ###################################
 
-- name: Template Ansible Hosts File
-  template: dest="{{ inventory_working_dir }}/hosts"  src=hosts.j2
-  
 - include_tasks: firewall_setup.yml
 
 - include_tasks: docker_setup.yml

@@ -5,6 +5,6 @@
 - name: Unregister Nodes
   become: yes
   hosts: all_nodes
-  remote_user: azure-user
+  remote_user: ocpadmin
   roles:
     - { role: unregister }
