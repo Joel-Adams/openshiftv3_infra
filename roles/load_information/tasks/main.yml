@@ -1,0 +1,8 @@
+---
+###################################
+# Common Packages
+###################################
+
+- name: Template Ansible Hosts File
+  template: dest="{{ inventory_working_dir }}/hosts"  src=hosts.j2
+  

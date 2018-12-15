@@ -1,0 +1,7 @@
+# file: 2_load.yml
+---
+
+- name: Setup workshop environment
+  hosts: bastion_nodes
+  roles:
+    - { role: load_information }
