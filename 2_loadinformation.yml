@@ -2,6 +2,6 @@
 ---
 
 - name: Setup workshop environment
-  hosts: bastion_nodes
+  hosts: localhost
   roles:
     - { role: load_information }
