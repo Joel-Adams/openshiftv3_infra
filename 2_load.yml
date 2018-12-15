@@ -2,7 +2,6 @@
 ---
 
 - name: Setup workshop environment
-  remote_user: "{{ openshift_admin_username }}"
   hosts: "{{ resource_group_name }}"
   roles:
     - { role: workshop_setup }
