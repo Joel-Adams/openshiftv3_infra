@@ -3,7 +3,7 @@
 
 - name: Setup workshop environment
   remote_user: "{{ openshift_admin_username }}"
-#  hosts: "{{ openshift_cluster_prefix }}-bastion"
+  hosts: "{{ openshift_cluster_prefix }}""-bastion"
   roles:
     - { role: workshop_setup }
 
