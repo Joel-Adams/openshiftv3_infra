@@ -38,4 +38,5 @@
     state: enabled
 
 - name: Restart Firewall
+  become: yes
   command: firewall-cmd --reload
