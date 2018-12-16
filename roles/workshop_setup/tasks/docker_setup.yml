@@ -33,7 +33,8 @@
 
 - name: Install epel packages
   become: yes
-  command: rpm -ivh epel-release-latest-7.noarch.rpm
+  yum:
+    name: epel-release-latest-7.noarch.rpm
 
 - name: Install pip
   become: yes
@@ -49,7 +50,7 @@
 #   command: scl enable python27 bash
 
 - name: Install latest version of pip
-  become: yes 
+  become: yes
   command: pip install --upgrade pip
 
 - name: install certain python modules for docker
