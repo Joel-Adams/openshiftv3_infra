@@ -25,7 +25,7 @@
   become: yes
   yum:
     name: python27-python-pip
-    state: latest
+    state: present
 
 - name: Enable pip
   become: yes
