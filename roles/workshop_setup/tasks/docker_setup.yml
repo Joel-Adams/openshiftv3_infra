@@ -8,6 +8,12 @@
     name: docker
     state: latest
 
+- name: Start and enable docker service
+  service:
+    name: docker
+    enabled: yes
+    state: started
+
 - name: Make docker directory
   become: yes
   file:
