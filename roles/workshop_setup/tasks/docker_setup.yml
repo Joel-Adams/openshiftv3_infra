@@ -15,20 +15,30 @@
     enabled: yes
     state: started
 
-- name: Enable repos
-  become: yes
-  shell: yum-config-manager --enable "{{ item }}" --save
-  with_items:
-  - rhel-server-rhscl-7-rpms
+# - name: Enable repos
+#   become: yes
+#   shell: yum-config-manager --enable "{{ item }}" --save
+#   with_items:
+#   - rhel-server-rhscl-7-rpms
+
+# - name: Install pip
+#   become: yes
+#   yum:
+#     name: python27-python-pip
+#     state: present
 
 - name: Install pip
   become: yes
   yum:
-    name: python27-python-pip
+    name: "{{ item.name }}"
     state: present
+  with_items:
+  - { name: epel-release }
+  - { name: python-pip }
 
-- name: Enable pip
-  command: scl enable python27 bash
+
+# - name: Enable pip
+#   command: scl enable python27 bash
 
 # - name: Install latest version of pip
 #   command: pip install --upgrade pip
