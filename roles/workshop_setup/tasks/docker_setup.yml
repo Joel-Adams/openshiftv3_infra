@@ -14,14 +14,14 @@
   git:
     repo: "https://github.com/Joel-Adams/snx-wetty.git"
     version: master
-    dest: "/home/{{ openshift_admin_username }}/dockyard"
+    dest: "/home/{{ openshift_admin_username }}/dockyard/snx-wetty"
     accept_hostkey: yes
 
 - name: Clone SNX nginx
   git:
     repo: "https://github.com/Joel-Adams/snx-nginx.git"
     version: master
-    dest: "/home/{{ openshift_admin_username }}/dockyard"
+    dest: "/home/{{ openshift_admin_username }}/dockyard/snx-nginx"
     accept_hostkey: yes
 
 - name: Template over nginx conf
