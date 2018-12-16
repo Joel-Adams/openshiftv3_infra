@@ -56,11 +56,8 @@
 - name: install certain python modules for docker
   become: yes
   pip:
-    name: "{{ item.name }}"
-    version: "{{ item.version }}"
+    name: docker
     state: present
-  with_items:
-  - { name: docker, version: 2.0.0 }
 
 - name: Make docker directory
   become: yes
