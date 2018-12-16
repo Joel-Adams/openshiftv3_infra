@@ -48,8 +48,8 @@
 # - name: Enable pip
 #   command: scl enable python27 bash
 
-# - name: Install latest version of pip
-#   command: pip install --upgrade pip
+- name: Install latest version of pip
+  command: pip install --upgrade pip
 
 - name: install certain python modules for docker
   become: yes
