@@ -31,6 +31,7 @@
   become: yes
   get_url:
     url: wget http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+    dest: "/home/{{ openshift_admin_username }}"
 
 - name: Install epel packages
   become: yes
