@@ -24,7 +24,7 @@
 - name: Install pip
   become: yes
   yum:
-    name: python27-python-pip -y
+    name: python27-python-pip
     state: latest
 
 - name: Enable pip
