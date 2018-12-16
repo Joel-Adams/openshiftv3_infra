@@ -15,6 +15,36 @@
     enabled: yes
     state: started
 
+- name: Enable repos
+  become: yes
+  shell: yum-config-manager --enable "{{ item }}" --save
+  with_items:
+  - rhel-server-rhscl-7-rpms
+
+- name: Install pip
+  become: yes
+  yum:
+    name: python27-python-pip -y
+    state: latest
+
+- name: Enable pip
+  become: yes
+  command: scl enable python27 bash
+
+- name: Install latest version of pip
+  become: yes
+  command: pip install --upgrade pip
+
+- name: install certain python modules for docker
+  become: yes
+  pip:
+    name: "{{ item.name }}"
+    version: "{{ item.version }}"
+    state: present
+  with_items:
+  - { name: docker, version: 2.0.0 }
+  - { name: docker-py, version: 1.10.6 }
+
 - name: Make docker directory
   become: yes
   file:
