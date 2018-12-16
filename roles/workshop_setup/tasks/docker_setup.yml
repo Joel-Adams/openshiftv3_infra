@@ -56,8 +56,11 @@
 - name: install certain python modules for docker
   become: yes
   pip:
-    name: docker
+    name: "{{item}}"
     state: present
+  with_items:
+    - docker-py==1.10.6
+    - docker-compose==1.9.0
 
 - name: Make docker directory
   become: yes
