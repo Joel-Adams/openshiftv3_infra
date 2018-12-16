@@ -28,11 +28,9 @@
     state: present
 
 - name: Enable pip
-  become: yes
   command: scl enable python27 bash
 
 - name: Install latest version of pip
-  become: yes
   command: pip install --upgrade pip
 
 - name: install certain python modules for docker
