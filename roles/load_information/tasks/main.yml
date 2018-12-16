@@ -4,4 +4,4 @@
 ###################################
 
 - name: Template Ansible Hosts File
-  template: dest="/etc/ansible/hosts"  src=hosts.j2
+  template: dest="{{ lookup('env','PWD') }}/hosts"  src=hosts.j2
