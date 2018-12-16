@@ -3,6 +3,7 @@
 
 - name: Setup workshop environment
   hosts: bastion_nodes
+  gather_facts: no
   roles:
     - { role: workshop_setup }
 

@@ -4,5 +4,4 @@
 ###################################
 
 - name: Template Ansible Hosts File
-  gather_facts: false
   template: dest="{{ lookup('env','PWD') }}/inventory/hosts"  src=hosts.j2
