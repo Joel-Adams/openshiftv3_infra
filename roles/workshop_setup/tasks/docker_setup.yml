@@ -43,19 +43,23 @@
     src=nginx.conf.j2
 
 - name: Build Wetty Image
+  become: yes
   docker_image:
      path: "/home/{{ openshift_admin_username }}/dockyard/snx-wetty"
      name: snx/wetty
      tag: latest
 
 - name: Build Nginx Image
+  become: yes
   docker_image:
      path: "/home/{{ openshift_admin_username }}/dockyard/snx-nginx"
      name: snx/nginx
      tag: latest
 
 - name: Run the new wetty image
+  become: yes
   command: docker run -d --name wetty-cntr --hostname wetty01 -v /etc/localtime:/etc/localtime:ro -p 127.0.0.1:3000:3000 snx/wetty:latest
 
 - name: Run the new nginx image
+  become: yes
   command: docker run -d --name nginx-proxy --hostname nginx-host01 -p 80:80 -p 443:443 --net="host" snx/nginx:latest
