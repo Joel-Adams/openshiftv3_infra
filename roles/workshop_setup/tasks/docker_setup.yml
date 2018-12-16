@@ -29,7 +29,8 @@
 
 - name: Get the epel packages
   become: yes
-  command: wget http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+  get_url:
+    url: wget http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 
 - name: Install epel packages
   become: yes
