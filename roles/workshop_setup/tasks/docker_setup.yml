@@ -2,6 +2,12 @@
 # Install docker containers
 #--------------------------------------------------
 
+- name: Install latest version of docker
+  become: yes
+  yum:
+    name: docker
+    state: latest
+
 - name: Make docker directory
   become: yes
   file:
