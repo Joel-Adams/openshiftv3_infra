@@ -1,13 +1,17 @@
 #--------------------------------------------------
-# Setup Bastion Firewall
+# Setup Nexus Container
 #--------------------------------------------------
 
-- name: Install Ansible Python 2 Dependencies
-  with_items:
-  - python-firewall
-  yum:
-    name: "{{item}}"
+- name: Create Project
+  oc:
     state: present
+    inline:
+      kind: ProjectRequest
+      metadata:
+        name: Nexus
+      displayName: Nexus Container
+      description: This project was created using Ansible
+    token: << redacted >>
 
 - name: Firewall exception https
   become: yes

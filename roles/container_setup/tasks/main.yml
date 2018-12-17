@@ -3,8 +3,4 @@
 # Common Packages
 ###################################
 
-- include_tasks: firewall_setup.yml
-
-- include_tasks: docker_setup.yml
-
-- include_tasks: hugo_setup.yml
+- include_tasks: container_setup
