@@ -44,7 +44,8 @@
 
 - name: Remove old hugo deployment
   become: yes
-  command: rm -rf "/home/{{ openshift_admin_username }}/github/redhatgov.github.io/hugo"
+  file: "/home/{{ openshift_admin_username }}/github/redhatgov.github.io/hugo"
+    state: absent
 
 - name: Extract hugo server
   unarchive:
@@ -58,7 +59,8 @@
     src=hugo.script.sh.j2
 
 - name: make the script executable
-  command: chmod +x "/home/{{ openshift_admin_username }}/github/redhatgov.github.io/hugoscript.sh"
+  file: "/home/{{ openshift_admin_username }}/github/redhatgov.github.io/hugoscript.sh"
+    mode: 0755
 
 - name: Start hugo in a screen
   become: yes
