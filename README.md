@@ -1,18 +1,18 @@
-# Ansible Tower Workshop
+# Openshiftv3 Workshop on Azure
 
 ![ansible](img/openshift_v3.png)
 
-`Ansible_Tower_Workshop` is a ansible playbook to provision Ansible Tower in Azure. This playbook uses Ansible to wrap Terraform, for provisioning Azure infrastructure and nodes. To find more info about Terraform [check here](https://www.terraform.io/docs/providers/azurerm/)
+`Openshiftv3 Workshop` is a ansible playbook to provision Openshift in Azure. This playbook uses Ansible to deploy Azure templates, for provisioning Azure infrastructure and nodes. To find more info about the templates [check here](https://github.com/Microsoft/openshift-container-platform)
 
 These modules all require that you have Azure ID's available to use to provision Azure resources. You also need to have Azure permissions set to allow you to create resources within Azure. There are several methods for setting up you Azure environment on you local machine.
 
-Fill out `env.sh` & Export the Azure ID's
+<!-- Fill out `env.sh` & Export the Azure ID's
 
 First, copy env.sh_example to env.sh, and then fill in your ID's.  Once that is complete, source the script, to export your Azure environment variables.
 
 ```
 source env.sh
-```
+``` -->
 
 This repo also requires that you have Ansible installed on your local machine. For the most upto date methods of installing Ansible for your operating system [check here](http://docs.ansible.com/ansible/intro_installation.html).
 
