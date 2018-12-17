@@ -43,7 +43,7 @@
 - name: Extract hugo server
   unarchive:
     src: "/home/{{ openshift_admin_username }}/hugo/hugo_0.52_Linux-64bit.tar.gz"
-    dest: "/home/{{ openshift_admin_username }}/github/redhatgov.github.io/hugo"
+    dest: "/home/{{ openshift_admin_username }}/github/redhatgov.github.io"
     remote_src: yes
 
 - name: Template over hugo script
