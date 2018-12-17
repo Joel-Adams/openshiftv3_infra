@@ -1,0 +1,74 @@
+#--------------------------------------------------
+# Install hugo
+#--------------------------------------------------
+
+- name: install latest version of screen
+  become: yes
+  yum:
+    name: screen
+    state: latest
+
+- name: install latest version of asciidoctor
+  become: yes
+  yum:
+    name: asciidoctor
+    state: latest
+
+- name: Make github directory
+  become: yes
+  file:
+    path:  "/var/tmp/github"
+    owner: "{{ openshift_admin_username }}"
+    mode: 0755
+    state: directory
+
+- name: Make hugo directory
+  become: yes
+  file:
+    path:  "/var/tmp/hugo"
+    owner: "{{ openshift_admin_username }}"
+    mode: 0755
+    state: directory
+
+- name: Clone redhatgov
+  git:
+    repo: "https://github.com/Joel-Adams/redhatgov.github.io.git"
+    version: docs
+    dest: "/var/tmp/github/redhatgov.github.io"
+    accept_hostkey: yes
+
+- name: Get hugo
+  get_url:
+    url:  https://github.com/gohugoio/hugo/releases/download/v0.52/hugo_0.52_Linux-64bit.tar.gz
+    dest: "/var/tmp/hugo/hugo_0.52_Linux-64bit.tar.gz"
+
+- name: Remove old hugo deployment
+  become: yes
+  file:
+    path: "/var/tmp/github/redhatgov.github.io/hugo"
+    state: absent
+
+- name: Extract hugo server
+  become: yes
+  unarchive:
+    src: "/var/tmp/hugo/hugo_0.52_Linux-64bit.tar.gz"
+    dest: "/var/tmp/github/redhatgov.github.io"
+    remote_src: yes
+
+- name: Template over hugo script
+  become: yes
+  template:
+    dest="/var/tmp/github/redhatgov.github.io/hugoscript.sh"
+    src=hugoscript.sh.j2
+
+- name: make the script executable
+  become: yes
+  file:
+    path: "/var/tmp/github/redhatgov.github.io/hugoscript.sh"
+    mode: 0755
+
+- name: Start hugo in a screen
+  become: yes
+  command: /var/tmp/github/redhatgov.github.io/hugoscript.sh arg1
+  args:
+    chdir: /var/tmp/github/redhatgov.github.io

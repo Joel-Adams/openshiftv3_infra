@@ -1,19 +1,18 @@
 # file: 2_load.yml
 ---
 
-- name: Setup workshop environment
-  hosts: bastion_nodes
-  gather_facts: no
-  roles:
-    - { role: workshop_setup }
-
-
-# - name: Configure repositories on tower nodes
-#   become: yes
-#   remote_user: azure-user
-#   hosts: nodes
+# - name: Setup workshop environment
+#   hosts: bastion_nodes
+#   gather_facts: no
 #   roles:
-#     - { role: subscription_manager }
+#     - { role: workshop_setup }
+
+
+- name: Configure Nexus Container
+  become: yes
+  hosts: master_nodes
+  roles:
+    - { role: container_setup }
 #
 # - name: Remove Red Hat EAP packages
 #   become: yes

@@ -1,0 +1,8 @@
+ansible_ssh_user="{{ openshift_admin_username }}"
+ansible_become=yes
+
+[local_target]
+localhost  ansible_connection=local  ansible_python_interpreter='/usr/bin/env python'
+
+[bastion_nodes]
+"{{ bastion_fqdn }}"
