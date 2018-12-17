@@ -17,7 +17,7 @@
 - name: Make github directory
   become: yes
   file:
-    path:  "/home/{{ openshift_admin_username }}/github"
+    path:  "/var/tmp/github"
     owner: "{{ openshift_admin_username }}"
     mode: 0755
     state: directory
@@ -25,7 +25,7 @@
 - name: Make hugo directory
   become: yes
   file:
-    path:  "/home/{{ openshift_admin_username }}/hugo"
+    path:  "/var/tmp/hugo"
     owner: "{{ openshift_admin_username }}"
     mode: 0755
     state: directory
@@ -34,36 +34,36 @@
   git:
     repo: "https://github.com/Joel-Adams/redhatgov.github.io.git"
     version: docs
-    dest: "/home/{{ openshift_admin_username }}/github/redhatgov.github.io"
+    dest: "/var/tmp/github/redhatgov.github.io"
     accept_hostkey: yes
 
 - name: Get hugo
   get_url:
     url:  https://github.com/gohugoio/hugo/releases/download/v0.52/hugo_0.52_Linux-64bit.tar.gz
-    dest: "/home/{{ openshift_admin_username }}/hugo/hugo_0.52_Linux-64bit.tar.gz"
+    dest: "/var/tmp/hugo/hugo_0.52_Linux-64bit.tar.gz"
 
 - name: Remove old hugo deployment
   become: yes
   file:
-    path: "/home/{{ openshift_admin_username }}/github/redhatgov.github.io/hugo"
+    path: "/var/tmp/github/redhatgov.github.io/hugo"
     state: absent
 
 - name: Extract hugo server
   unarchive:
-    src: "/home/{{ openshift_admin_username }}/hugo/hugo_0.52_Linux-64bit.tar.gz"
-    dest: "/home/{{ openshift_admin_username }}/github/redhatgov.github.io"
+    src: "/var/tmp/hugo/hugo_0.52_Linux-64bit.tar.gz"
+    dest: "/var/tmp/github/redhatgov.github.io"
     remote_src: yes
 
 - name: Template over hugo script
   template:
-    dest="/home/{{ openshift_admin_username }}/github/redhatgov.github.io/hugoscript.sh"
+    dest="/var/tmp/github/redhatgov.github.io/hugoscript.sh"
     src=hugoscript.sh.j2
 
 - name: make the script executable
   file:
-    path: "/home/{{ openshift_admin_username }}/github/redhatgov.github.io/hugoscript.sh"
+    path: "/var/tmp/github/redhatgov.github.io/hugoscript.sh"
     mode: 0755
 
 - name: Start hugo in a screen
   become: yes
-  command: sh /home/{{ openshift_admin_username }}/github/redhatgov.github.io/hugoscript.sh
+  command: /var/tmp/github/redhatgov.github.io/hugoscript.sh
