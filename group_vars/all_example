@@ -69,4 +69,3 @@ workshop_password:                "redhat!@#"
 #--------------------------------------------------------------------------------------
 #Environment Variables     |      Variables once playbook 1 has completed
 bastion_fqdn:                     ""
-master_fqdn:                      ""
