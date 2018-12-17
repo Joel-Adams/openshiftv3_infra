@@ -8,6 +8,12 @@
     name: screen
     state: latest
 
+- name: install latest version of asciidoctor
+  become: yes
+  yum:
+    name: asciidoctor
+    state: latest
+
 - name: Make github directory
   become: yes
   file:
