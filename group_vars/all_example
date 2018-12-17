@@ -32,7 +32,7 @@ cns_vm_size:                      "Standard_E4s_v3"    # CNS Instance Size
 region:                           "eastus2"    # Azure Region
 azure_image_id:                   ""    # Azure ID of custom image sourceImageURI
 data_disk_size:                   "128"  #GB size of Data Disk - Allowed Values 32,64,128,256,512,1024,2048
-openshift_cluster_prefix:         "snxocp2"  # All_lower_case
+openshift_cluster_prefix:         "rhocp"  # All_lower_case
 openshift_admin_username:	  "ocpadmin"
 openshift_password:		  "RedHat!@#123"
 #--------------------------------------------------------------------------------------
