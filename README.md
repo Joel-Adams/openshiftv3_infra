@@ -1,6 +1,6 @@
 # Ansible Tower Workshop
 
-![ansible](img/Ansible-Tower-Logotype-Large-RGB-FullGrey-300x124.png)
+![ansible](img/openshift_v3.png)
 
 `Ansible_Tower_Workshop` is a ansible playbook to provision Ansible Tower in Azure. This playbook uses Ansible to wrap Terraform, for provisioning Azure infrastructure and nodes. To find more info about Terraform [check here](https://www.terraform.io/docs/providers/azurerm/)
 
