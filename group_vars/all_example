@@ -36,8 +36,6 @@ openshift_cluster_prefix:         "rhocp"  # All_lower_case
 openshift_admin_username:	  "ocpadmin"
 openshift_password:		  "RedHat!@#123"
 #--------------------------------------------------------------------------------------
-# subscription_manager     |      Red Hat Subscription via Cloud Access
-cloud_access:                      true
 # subscription_manager     |      Red Hat Subscription via username & password
 username:                         ""
 password:                         ""
@@ -63,9 +61,6 @@ routing_cert_type:                "selfsigned"
 master_cert_type:                 "selfsigned"
 master_private_cluster_ip:	      "13.1.0.200"
 router_private_cluster_ip:        "13.2.0.201"
-#--------------------------------------------------------------------------------------
-# wetty                    |      password
-workshop_password:                "redhat!@#"
 #--------------------------------------------------------------------------------------
 #Environment Variables     |      Variables once playbook 1 has completed
 bastion_fqdn:                     ""
