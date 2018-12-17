@@ -10,8 +10,9 @@ This repo also requires that you have Ansible installed on your local machine. F
 
 ## Prerequisites
 
-### Upload Red Hat Image to AZURE
+### Prepare and Upload Red Hat Image to AZURE
 
+If you don't have a Red Hat image stored in the Azure region you would like to deploy Openshift please see this documentation [click here](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/redhat-create-upload-vhd).
 
 ### Generate SSH Keys
 
