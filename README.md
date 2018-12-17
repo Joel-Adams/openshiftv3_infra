@@ -19,7 +19,7 @@ This repo also requires that you have Ansible installed on your local machine. F
 ## Azure Infrastructure Roles
 
 
-### roles/azure.infra.terraform
+### roles/azure.infra
 
 To create infrastructure and a Openshift instance via Ansible:
 
@@ -48,35 +48,36 @@ pool_id:                          ""
 ```
 
 ## Configure Workshop Nodes
-To call terraform to provision the nodes run the first playbook.
+To call Ansible to provision the nodes and openshift environment run the first playbook.
 
 ```
 ansible-playbook 1_provision.yml
-```
-To install and configure the necessary software, on the newly created nodes, run the second playbook. It may be re-run as many times as necessary. The SUDO password is your local sudo password.
 
 ```
-ansible-playbook 2_load.yml -K
-```
-
-To destroy
+Once the first playbook is created, go back into group_vars/all and update the bastion_fqdn with found in the Azure portal -> bastion VM -> DNS name. Then run the second playbook.
 
 ```
-ansible-playbook 3_unregister.yml # only need to run this if you aren't using Cloud Access
-cd .redhatgov
-terraform destroy
-```
+ansible-playbook 2_loadinformation.yml
 
 ```
+
+To install and configure all of the needed software for the workshop run the below command replacing the openshift_admin_username and private key location with your own.
+
+```
+ansible-playbook -u {{ openshift_admin_username }} 3_setup_bastion_host.yml --private-key {{ /etc/ssh/openshift_ssh_rsa }}
+
 ```
 
 ## Login to Ansible Tower
 
-Browse to the URL of the Azure instance and enter the `azure-user`'s password (workshop_password:) located in `group_vars/all`.
+Browse to the URL of the Master DNS load balancer. This can be found in the Azure portal -> master VM -> DNS name.
 
 ```
-https://{{ workshop_prefix }}-tower0.{{ region }}.cloudapp.azure.com:8888/wetty/ssh/azure-user
+https://{{ master_fqdn }}/console
+
 ```
+username: found in group_vars/all variable openshift_admin_username
+password: found in group_vars/all variable openshift_password
 
 ![Tower Login](img/ansible-tower.png)
 
