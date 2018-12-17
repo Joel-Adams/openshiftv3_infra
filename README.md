@@ -77,6 +77,7 @@ https://{{ master_fqdn }}/console
 
 ```
 username: found in group_vars/all variable openshift_admin_username
+
 password: found in group_vars/all variable openshift_password
 
 ![Tower Login](img/ansible-tower.png)
