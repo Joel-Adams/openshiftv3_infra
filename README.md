@@ -91,6 +91,10 @@ https://{{ bastion_fqdn }}/wetty
 
 ![Wetty Login](img/wetty_login.png)
 
+The login for the wetty access will be `labuser`(01-50) with a password of `RedHat123`.
+
+![Wetty Logged In](img/wetty_loged_in.png)
+
 ## Walkthrough for Scripts
 
 A walkthrough for most of the typewritten steps has been added to the workshop, both to speed up workshops presented within a limited schedule, or to help a studenmt who has made a mistake, or who has fallen far behind.
