@@ -1,4 +1,4 @@
 #!/bin/bash
 
 if [ -z "$STY" ]; then exec screen -dm -S hugoserver /bin/bash "$0"; fi
-./hugo server --bind=0.0.0.0 --baseUrl=http://"{{ bastion_fqdn }}" --port=8080
+./hugo server --bind=0.0.0.0 --baseUrl=http://{{ bastion_fqdn }} --port=8080
