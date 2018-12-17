@@ -10,6 +10,9 @@ This repo also requires that you have Ansible installed on your local machine. F
 
 ## Prerequisites
 
+### Upload Red Hat Image to AZURE
+
+
 ### Generate SSH Keys
 
 You'll need to generate an SSH key pair (Public / Private) in order to provision this template. Ensure that you do **NOT** include a passphrase with the private key. <br/><br/>
