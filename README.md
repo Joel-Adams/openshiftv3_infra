@@ -16,62 +16,35 @@ source env.sh
 
 This repo also requires that you have Ansible installed on your local machine. For the most upto date methods of installing Ansible for your operating system [check here](http://docs.ansible.com/ansible/intro_installation.html).
 
-This repo also requires that Terraform be installed if you are using the azure.infra.terraform role. For the most upto data methods of installing Terraform for your operating system [check here](https://www.terraform.io/downloads.html).
-
-
-
 ## Azure Infrastructure Roles
 
 
 ### roles/azure.infra.terraform
 
-To create infrastructure and a Ansible Tower instance via Terraform:
+To create infrastructure and a Openshift instance via Ansible:
 
-**** OS X
-```
-sudo easy_install pip
-sudo pip install boto
-sudo pip install ansible
-sudo pip install passlib
-/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-brew install terraform
-```
-
-**** RHEL/CentOS
-```
-sudo yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-# server
-subscription-manager repos --enable="rhel-7-server-rpms" --enable="rhel-7-server-extras-rpms" --enable="rhel-7-server-optional-rpms"
-# workstation
-subscription-manager repos --enable="rhel-7-workstation-rpms" --enable="rhel-7-workstation-extras-rpms" --enable="rhel-7-workstation-optional-rpms"
-sudo yum -y install python2-boto ansible
-wget https://releases.hashicorp.com/terraform/0.9.11/terraform_0.9.11_linux_amd64.zip # current release as of this date...check to see if a newer version is availabke
-sudo unzip terraform_0.9.11_linux_amd64.zip -d /usr/local/bin terraform
-```
-
-**** Fedora 25/26
-```
-sudo dnf -y install python2-boto ansible libselinux-python
-wget https://releases.hashicorp.com/terraform/0.9.11/terraform_0.9.11_linux_amd64.zip # current release as of this date...check to see if a newer version is availabke
-sudo unzip terraform_0.9.11_linux_amd64.zip -d /usr/local/bin terraform
-```
-
-First, copy group_vars/all_example to group_vars/all, and then edit `group_vars/all` and fill in the vars with your Azure api info. This role can also provide easy domain name mapping to all the instances if you have a domain registered in Azure. You can also update the number of tower instances to be created and the number of node instances to be created.
+First, copy group_vars/all_example to group_vars/all, and then edit `group_vars/all` and fill out the below variables:
 
 
 ```
 #####################################################
-# Domain Name you own
-#####################################################
-domain_name: ""
-
-#####################################################
-# Azure ID's for terraform.tfvars file
+Azure Information
 #####################################################
 azure_subscription_id:            ""
 azure_client_id:                  ""
 azure_client_secret:		          ""
 azure_tenant_id:		              ""
+azure_image_id:                   ""
+ssh_public_key:                   "" # Full public key
+key_vault_resource_group:         "" # Resource group where key vault is located
+key_vault_name:                   "" # Name of the key vault
+key_vault_secret:                 "" # Name of the secret key
+#####################################################
+Red Hat Information
+#####################################################
+username:                         ""
+password:                         ""
+pool_id:                          ""
 ```
 
 ## Configure Workshop Nodes
