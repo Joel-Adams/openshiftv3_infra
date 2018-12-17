@@ -51,7 +51,7 @@
     dest="/home/{{ openshift_admin_username }}/github/redhatgov.github.io/hugoscript.sh"
     src=hugo.script.sh.j2
 
-- name: make the scrip executable
+- name: make the script executable
   command: chmod +x "/home/{{ openshift_admin_username }}/github/redhatgov.github.io/hugoscript.sh"
 
 - name: Start hugo in a screen
