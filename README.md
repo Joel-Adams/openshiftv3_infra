@@ -91,7 +91,7 @@ https://{{ bastion_fqdn }}/wetty
 
 ![Wetty Login](img/wetty_login.png)
 
-The login for the wetty access will be `labuser`(01-50) with a password of `RedHat123`.
+The login for the wetty access will be `labuser(01-50)` with a password of `RedHat123`.
 
 ![Wetty Logged In](img/wetty_loged_in.png)
 
