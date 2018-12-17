@@ -3,6 +3,7 @@
 #--------------------------------------------------
 
 - name: install latest version of screen
+  become: yes
   yum:
     name: screen
     state: latest
