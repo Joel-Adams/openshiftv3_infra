@@ -2,45 +2,11 @@
 # Setup Nexus Container
 #--------------------------------------------------
 
-- name: Create Project
-  oc:
+- name: Create a project
+  openshift_raw:
+    api_version: v1
+    kind: Project
+    name: testing22
+    description: Testing22
+    display_name: "This is a test project."
     state: present
-    inline:
-      kind: ProjectRequest
-      metadata:
-        name: Nexus
-      displayName: Nexus Container
-      description: This project was created using Ansible
-    token: << redacted >>
-
-- name: Firewall exception https
-  become: yes
-  firewalld:
-    service: https
-    permanent: yes
-    state: enabled
-
-- name: Firewall exception http
-  become: yes
-  firewalld:
-    service: http
-    permanent: yes
-    state: enabled
-
-- name: Firewall exception port 3000
-  become: yes
-  firewalld:
-    port: 3000/tcp
-    permanent: yes
-    state: enabled
-
-- name: Firewall exception port 8080
-  become: yes
-  firewalld:
-    port: 8080/tcp
-    permanent: yes
-    state: enabled
-
-- name: Restart Firewall
-  become: yes
-  command: firewall-cmd --reload
