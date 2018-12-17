@@ -82,13 +82,14 @@ password: found in `group_vars/all` variable `openshift_password`
 
 ![Openshift Login](img/oshit_console.png)
 
-There is a web-based IDE running on port 8443 of each tower node.  That IDE can be used to edit Ansible playbooks, rather than using a command line editor, like `vim` or `nano`.
+There is a web based ide (wetty) running on the bastion node that each user can log into. This will give them access to perform the Openshift commands on the workshop
 
 ```
-https://{{ workshop_prefix }}-tower0.{{ region }}.cloudapp.azure.com:8443
+https://{{ bastion_fqdn }}/wetty
+
 ```
 
-![Codiad Login](img/codiad.png)
+![Wetty Login](img/wetty_login.png)
 
 ## Walkthrough for Scripts
 
