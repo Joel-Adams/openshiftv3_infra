@@ -62,4 +62,4 @@
 
 - name: Start hugo in a screen
   become: yes
-  command: screen -S hugo -d -m "/home/{{ openshift_admin_username }}/github/redhatgov.github.io/hugoscript"
+  script: "/home/{{ openshift_admin_username }}/github/redhatgov.github.io/hugoscript.sh"
