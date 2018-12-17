@@ -49,17 +49,20 @@
     state: absent
 
 - name: Extract hugo server
+  become: yes
   unarchive:
     src: "/var/tmp/hugo/hugo_0.52_Linux-64bit.tar.gz"
     dest: "/var/tmp/github/redhatgov.github.io"
     remote_src: yes
 
 - name: Template over hugo script
+  become: yes
   template:
     dest="/var/tmp/github/redhatgov.github.io/hugoscript.sh"
     src=hugoscript.sh.j2
 
 - name: make the script executable
+  become: yes
   file:
     path: "/var/tmp/github/redhatgov.github.io/hugoscript.sh"
     mode: 0755
