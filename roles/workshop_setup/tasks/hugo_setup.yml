@@ -44,7 +44,8 @@
 
 - name: Remove old hugo deployment
   become: yes
-  file: "/home/{{ openshift_admin_username }}/github/redhatgov.github.io/hugo"
+  file:
+    path: "/home/{{ openshift_admin_username }}/github/redhatgov.github.io/hugo"
     state: absent
 
 - name: Extract hugo server
@@ -59,7 +60,8 @@
     src=hugo.script.sh.j2
 
 - name: make the script executable
-  file: "/home/{{ openshift_admin_username }}/github/redhatgov.github.io/hugoscript.sh"
+  file:
+    path: "/home/{{ openshift_admin_username }}/github/redhatgov.github.io/hugoscript.sh"
     mode: 0755
 
 - name: Start hugo in a screen
