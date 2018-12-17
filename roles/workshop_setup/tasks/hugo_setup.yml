@@ -55,18 +55,20 @@
     dest: "/var/tmp/github/redhatgov.github.io"
     remote_src: yes
 
-# - name: Template over hugo script
-#   become: yes
-#   template:
-#     dest="/var/tmp/github/redhatgov.github.io/hugoscript.sh"
-#     src=hugoscript.sh.j2
+- name: Template over hugo script
+  become: yes
+  template:
+    dest="/var/tmp/github/redhatgov.github.io/hugoscript.sh"
+    src=hugoscript.sh.j2
 
-# - name: make the script executable
-#   become: yes
-#   file:
-#     path: "/var/tmp/github/redhatgov.github.io/hugoscript.sh"
-#     mode: 0755
+- name: make the script executable
+  become: yes
+  file:
+    path: "/var/tmp/github/redhatgov.github.io/hugoscript.sh"
+    mode: 0755
 
 - name: Start hugo in a screen
   become: yes
-  command: /var/tmp/github/redhatgov.github.io/hugo server --bind=0.0.0.0 --baseUrl=http://bastiondnskufoizqp6lyo4.eastus2.cloudapp.azure.com --port=8080
+  command: /var/tmp/github/redhatgov.github.io/hugoscript.sh arg1
+  args:
+    chdir: /var/tmp/github/redhatgov.github.io
