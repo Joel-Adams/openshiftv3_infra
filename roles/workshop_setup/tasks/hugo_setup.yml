@@ -66,4 +66,5 @@
 
 - name: Start hugo in a screen
   become: yes
-  command: sh "/home/{{ openshift_admin_username }}/github/redhatgov.github.io/hugoscript.sh"
+  script: "{{ lookup('env', 'PWD') }}"/hugoscript.sh
+    chdir: "/home/{{ openshift_admin_username }}/github/redhatgov.github.io"
