@@ -57,7 +57,7 @@
 - name: Template over hugo script
   template:
     dest="/home/{{ openshift_admin_username }}/github/redhatgov.github.io/hugoscript.sh"
-    src=hugo.script.sh.j2
+    src=hugoscript.sh.j2
 
 - name: make the script executable
   file:
