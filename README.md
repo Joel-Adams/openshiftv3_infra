@@ -14,6 +14,8 @@ This repo also requires that you have Ansible installed on your local machine. F
 
 If you don't have a Red Hat image stored in the Azure region you would like to deploy Openshift please see this documentation [click here](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/redhat-create-upload-vhd).
 
+Using your own image will insure everything is up to standards and make sure you don't get double billed for the marketplace image. 
+
 ### Generate SSH Keys
 
 You'll need to generate an SSH key pair (Public / Private) in order to provision this template. Ensure that you do **NOT** include a passphrase with the private key. <br/><br/>
