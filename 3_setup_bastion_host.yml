@@ -1,61 +1,8 @@
 # file: 2_load.yml
 ---
 
-# - name: Setup workshop environment
-#   hosts: bastion_nodes
-#   gather_facts: no
-#   roles:
-#     - { role: workshop_setup }
-
-
-- name: Configure Nexus Container
-  become: yes
-  hosts: master_nodes
+- name: Setup workshop environment
+  hosts: bastion_nodes
+  gather_facts: no
   roles:
-    - { role: container_setup }
-#
-# - name: Remove Red Hat EAP packages
-#   become: yes
-#   remote_user: azure-user
-#   hosts: all_nodes
-#   tasks:
-#   - package:
-#       name: eap7-*
-#       state: absent
-#
-# - name: Configure repositories on nodes
-#   become: yes
-#   remote_user: azure-user
-#   hosts: le_node
-#   roles:
-#     - { role: LetsEncrypt }
-#
-# - name: Configure software on nodes
-#   become: yes
-#   remote_user: azure-user
-#   hosts: tower_nodes
-#   roles:
-#     - { role: nodejs }
-#     - { role: wetty }
-#     - { role: zsh }
-#     - { role: codiad }
-#
-# - name: Prep walkthroughs for deployment
-#   become: yes
-#   remote_user: azure-user
-#   hosts: tower_nodes
-#   vars:
-#     install: no
-#     prep: yes
-#   roles:
-#     - { role: ansible.tower }
-#
-# - name: Configure software and deploy walkthroughs
-#   become: yes
-#   remote_user: azure-user
-#   hosts: tower_nodes
-#   vars:
-#     install: yes
-#     prep: no
-#   roles:
-#     - { role: ansible.tower }
+    - { role: workshop_setup }
