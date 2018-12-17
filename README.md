@@ -80,7 +80,7 @@ username: found in `group_vars/all` variable `openshift_admin_username`
 
 password: found in `group_vars/all` variable `openshift_password`
 
-![Tower Login](img/ansible-tower.png)
+![Openshift Login](img/oshit_console.png)
 
 There is a web-based IDE running on port 8443 of each tower node.  That IDE can be used to edit Ansible playbooks, rather than using a command line editor, like `vim` or `nano`.
 
