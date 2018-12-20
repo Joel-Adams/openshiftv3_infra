@@ -158,12 +158,14 @@ The login for the wetty access will be `labuser(01-50)` with a password of `RedH
 
 ![Wetty Logged In](img/wetty_loged_in.png)
 
-Once the system is setup you have to create Openshift users. The ansible playbook can be found here - /home/{{ openshift_admin_username }}/dockyard/openshift-container-playbook/addocpuser.yaml
+## Setup the Nexus Repository
+
+Log into the command line as the {{ openshift_admin_username }} using the wetty console or SSH from the bastion host. Then setup the nexus container.
+
+```
+oc new-project nexus
+oc new-app sonatype/nexus
+oc expose svc/nexus
 
 
-
-## Walkthrough for Scripts
-
-A walkthrough for most of the typewritten steps has been added to the workshop, both to speed up workshops presented within a limited schedule, or to help a studenmt who has made a mistake, or who has fallen far behind.
-
-The walkthrough is deployed on the tower nodes, in `~azure-user/walkthrough`.
+```
