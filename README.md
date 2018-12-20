@@ -192,8 +192,8 @@ Now the workshop environment is completely setup and ready to go.
 
 There is also a hugo server that is deployed locally on the bastion host that can be used for the workshop steps.
 
-Open up a browser to the {{ bastion_fqdn }}:8080
-Select the **Openshiftv3 on Azure** workshop.
+Open up a browser to the {{ bastion_fqdn }}:8080 <br/>
+Select the **Openshiftv3 on Azure** workshop. <br/>
 Provide each student with a user number 1-50, bastion DNS name, master DNS name, and region. Once populated it will save the variables for each student to use during the workshop.
 
 
