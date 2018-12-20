@@ -172,11 +172,9 @@ Log into the Nexus console using the route provided. User name `admin` password 
 
 1. Go to settings -> Repositories
 2. Select Create Repository -> maven2(proxy)
-  a. Name: apache
-
-  b. Remote storage: http://nexus-nexus.104.209.170.217.nip.io/repository/apache/
-  
-  c. Create Repository
+  a. Name: apache <br/>
+  b. Remote storage: http://nexus-nexus.104.209.170.217.nip.io/repository/apache/ <br/>
+  c. Create Repository <br/>
 3. Select Create Repository -> maven2(proxy)
   a. Name: jboss
   b. Remote storage: http://nexus-nexus.104.209.170.217.nip.io/repository/jboss/
