@@ -8,6 +8,11 @@ These modules all require that you have Azure ID's available to use to provision
 
 This repo also requires that you have Ansible installed on your local machine. For the most upto date methods of installing Ansible for your operating system [check here](http://docs.ansible.com/ansible/intro_installation.html).
 
+Make sure that you have pip installed and and on the latest version [check here](https://pip.pypa.io/en/stable/installing/).
+
+Install necessary modules:
+`pip install packaging msrestazure ansible[azure]`
+
 ## Prerequisites
 
 ### Prepare and Upload Red Hat Image to AZURE
@@ -21,6 +26,8 @@ Using your own image will insure everything is up to standards and make sure you
 You'll need to generate an SSH key pair (Public / Private) in order to provision this template. Ensure that you do **NOT** include a passphrase with the private key. <br/><br/>
 If you are using a Windows computer, you can download puttygen.exe.  You will need to export to OpenSSH (from Conversions menu) to get a valid Private Key for use in the Template.<br/><br/>
 From a Linux or Mac, you can just use the ssh-keygen command.  Once you are finished deploying the cluster, you can always generate new keys that uses a passphrase and replace the original ones used during initial deployment.
+
+Make sure to keep a local copy of the public and private key that was created for future access.
 
 ### Create Key Vault to store SSH Private Key
 
