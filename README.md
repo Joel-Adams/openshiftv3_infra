@@ -122,6 +122,8 @@ ansible-playbook 2_loadinformation.yml
 
 ```
 
+You might get an error stating `"Aborting, target uses selinux but python bindings (libselinux-python) aren't installed!"`. If so please install the libselinux-python an re-run the playbook. 
+
 To install and configure all of the needed software for the workshop run the below command replacing the openshift_admin_username and private key location with your own.
 
 ```
