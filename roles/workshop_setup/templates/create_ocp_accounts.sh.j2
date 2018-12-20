@@ -1,0 +1,13 @@
+#!/bin/bash
+
+TERMCOUNT=50
+for (( i=1; i<=$TERMCOUNT; i++ ))
+do
+   printf -v loopnum "%02d" $i
+   echo "Setting up OpenShift user labuser$loopnum"
+   export SUDOUSER=labuser$loopnum
+   export PASSWORD=RedHat123
+   echo $SUDOUSER
+   echo $PASSWORD
+   runuser {{ openshift_admin_username }} -c "ansible-playbook /home/{{ openshift_admin_username }}/dockyard/openshift-container-playbook/addocpuser.yaml"
+done

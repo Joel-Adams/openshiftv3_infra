@@ -158,6 +158,8 @@ The login for the wetty access will be `labuser(01-50)` with a password of `RedH
 
 ![Wetty Logged In](img/wetty_loged_in.png)
 
+Once the system is setup you have to create Openshift users. The ansible playbook can be found here - /home/{{ openshift_admin_username }}/dockyard/openshift-container-playbook/addocpuser.yaml
+
 
 
 ## Walkthrough for Scripts

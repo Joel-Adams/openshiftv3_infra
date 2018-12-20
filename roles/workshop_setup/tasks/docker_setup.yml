@@ -98,6 +98,23 @@
     dest="/home/{{ openshift_admin_username }}/dockyard/snx-nginx/conf.d/proxy.conf"
     src=nginx.conf.j2
 
+- name: Template over create ocp user accounts
+  template:
+    dest="/home/{{ openshift_admin_username }}/dockyard/openshift-container-playbook/create_ocp_accounts.sh"
+    src=create_ocp_accounts.sh.j2
+
+- name: make the script executable
+  become: yes
+  file:
+    path: "/home/{{ openshift_admin_username }}/dockyard/openshift-container-playbook/create_ocp_accounts.sh"
+    mode: 0755
+
+- name: Start the script
+  become: yes
+  command: /home/{{ openshift_admin_username }}/dockyard/openshift-container-playbook/create_ocp_accounts.sh arg1
+  args:
+    chdir: /home/{{ openshift_admin_username }}/dockyard/openshift-container-playbook
+
 - name: Build Wetty Image
   become: yes
   docker_image:
