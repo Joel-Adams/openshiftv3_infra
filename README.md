@@ -164,8 +164,39 @@ Log into the command line as the {{ openshift_admin_username }} using the wetty 
 
 ```
 oc new-project nexus
-oc new-app sonatype/nexus
-oc expose svc/nexus
-
-
+oc new-app sonatype/nexus3
+oc expose svc/nexus3
+oc get route
 ```
+Log into the Nexus console using the route provided. User name `admin` password `admin123`
+
+1. Go to settings -> Repositories
+2. Select Create Repository -> maven2(proxy)
+  a. Name: apache
+  b. Remote storage: http://nexus-nexus.104.209.170.217.nip.io/repository/apache/
+  c. Create Repository
+3. Select Create Repository -> maven2(proxy)
+  a. Name: jboss
+  b. Remote storage: http://nexus-nexus.104.209.170.217.nip.io/repository/jboss/
+  c. Create Repository  
+4. Select Create Repository -> maven2(proxy)
+  a. Name: jboss-releases
+  b. Remote storage: http://nexus-nexus.104.209.170.217.nip.io/repository/jboss-releases/
+  c. Create Repository  
+5. Select maven-public (This will give you the URL needed for the workshop exercises under `URL:`)
+  a. If not already there, add the apache, jboss, and jboss-releases to the Available Member repositories:
+
+Now the workshop environment is completely setup and ready to go.
+
+## Hugo Server Workshop steps
+
+There is also a hugo server that is deployed locally on the bastion host that can be used for the workshop steps.
+
+Open up a browser to the {{ bastion_fqdn }}:8080
+Select the **Openshiftv3 on Azure** workshop.
+Provide each student with a user number 1-50, bastion DNS name, master DNS name, and region. Once populated it will save the variables for each student to use during the workshop.
+
+
+## Once the workshop is completed
+
+You can either shut down the environment via the Azure Portal as to not incur VM charges or delete the resource group that was created to not incur any additional charges. If you choose to delete the resource group be sure to first un-register each host from Red Hat subscription manager via [click here](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/installation_guide/chap-subscription-management-unregistering) or log into access.redhat.com and delete the systems from using your subscriptions. 
