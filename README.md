@@ -127,7 +127,7 @@ You might get an error stating `"Aborting, target uses selinux but python bindin
 To install and configure all of the needed software for the workshop run the below command replacing the `openshift_admin_username` and `private key location` with your own.
 
 ```
-ansible-playbook -u {{ openshift_admin_username }} 3_setup_bastion_host.yml --private-key {{ /etc/ssh/openshift_ssh_rsa }}
+ansible-playbook -u {{ openshift_admin_username }} 3_setup_bastion_host.yml --private-key {{ /etc/ssh/oshift_key_rsa }}
 
 ```
 
