@@ -9,5 +9,5 @@ do
    export PASSWORD=RedHat123
    echo $SUDOUSER
    echo $PASSWORD
-   runuser {{ openshift_admin_username }} -c "ansible-playbook /home/{{ openshift_admin_username }}/dockyard/openshift-container-playbook/addocpuser.yaml"
+   runuser {{ openshift_admin_username }} -c "ansible-playbook /home/{{ openshift_admin_username }}/dockyard/openshift-container-playbook/addocpuser2.yaml"
 done

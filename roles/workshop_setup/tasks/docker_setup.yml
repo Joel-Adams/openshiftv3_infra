@@ -103,6 +103,11 @@
     dest="/home/{{ openshift_admin_username }}/dockyard/openshift-container-playbook/create_ocp_accounts.sh"
     src=create_ocp_accounts.sh.j2
 
+- name: Template over add ocpuser2 yaml
+  template:
+    dest="/home/{{ openshift_admin_username }}/dockyard/openshift-container-playbook/addocpuser2.yaml"
+    src=addocpuser2.yaml.j2
+
 - name: make the script executable
   become: yes
   file:
