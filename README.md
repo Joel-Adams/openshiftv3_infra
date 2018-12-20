@@ -14,7 +14,7 @@ This repo also requires that you have Ansible installed on your local machine. F
 
 If you don't have a Red Hat image stored in the Azure region you would like to deploy Openshift please see this documentation [click here](https://docs.microsoft.com/en-us/azure/virtual-machines/linux/redhat-create-upload-vhd).
 
-Using your own image will insure everything is up to standards and make sure you don't get double billed for the marketplace image. 
+Using your own image will insure everything is up to standards and make sure you don't get double billed for the marketplace image.
 
 ### Generate SSH Keys
 
@@ -108,7 +108,7 @@ To call Ansible to provision the nodes and openshift environment run the first p
 ansible-playbook 1_provision.yml
 
 ```
-Once the first playbook is created, go back into group_vars/all and update the bastion_fqdn with found in the Azure portal -> bastion VM -> DNS name. Then run the second playbook.
+Once the first playbook is created, go back into group_vars/all and update the bastion_fqdn. This can be found in the Azure portal -> bastion VM -> DNS name. Then run the second playbook.
 
 ```
 ansible-playbook 2_loadinformation.yml
@@ -122,7 +122,7 @@ ansible-playbook -u {{ openshift_admin_username }} 3_setup_bastion_host.yml --pr
 
 ```
 
-## Login to Ansible Tower
+## Login to the Openshift Console
 
 Browse to the URL of the Master DNS load balancer. This can be found in the Azure portal -> master VM -> DNS name.
 
