@@ -86,6 +86,13 @@
     dest: "/home/{{ openshift_admin_username }}/dockyard/snx-nginx"
     accept_hostkey: yes
 
+- name: Clone Openshift Playbooks
+  git:
+    repo: "https://github.com/Microsoft/openshift-container-platform-playbooks.git"
+    version: master
+    dest: "/home/{{ openshift_admin_username }}/dockyard/openshift-container-playbook"
+    accept_hostkey: yes
+
 - name: Template over nginx conf
   template:
     dest="/home/{{ openshift_admin_username }}/dockyard/snx-nginx/conf.d/proxy.conf"
