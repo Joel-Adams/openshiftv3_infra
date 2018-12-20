@@ -171,20 +171,20 @@ oc get route
 Log into the Nexus console using the route provided. User name `admin` password `admin123`
 
 1. Go to settings -> Repositories
-2. Select Create Repository -> maven2(proxy)
+2. Select Create Repository -> maven2(proxy) <br/>
   a. Name: apache <br/>
   b. Remote storage: http://nexus-nexus.104.209.170.217.nip.io/repository/apache/ <br/>
   c. Create Repository <br/>
-3. Select Create Repository -> maven2(proxy)
-  a. Name: jboss
-  b. Remote storage: http://nexus-nexus.104.209.170.217.nip.io/repository/jboss/
-  c. Create Repository  
-4. Select Create Repository -> maven2(proxy)
-  a. Name: jboss-releases
-  b. Remote storage: http://nexus-nexus.104.209.170.217.nip.io/repository/jboss-releases/
-  c. Create Repository  
-5. Select maven-public (This will give you the URL needed for the workshop exercises under `URL:`)
-  a. If not already there, add the apache, jboss, and jboss-releases to the Available Member repositories:
+3. Select Create Repository -> maven2(proxy) <br/>
+  a. Name: jboss <br/>
+  b. Remote storage: http://nexus-nexus.104.209.170.217.nip.io/repository/jboss/ <br/>
+  c. Create Repository <br/>
+4. Select Create Repository -> maven2(proxy) <br/>
+  a. Name: jboss-releases <br/>
+  b. Remote storage: http://nexus-nexus.104.209.170.217.nip.io/repository/jboss-releases/ <br/>
+  c. Create Repository   <br/>
+5. Select maven-public (This will give you the URL needed for the workshop exercises under `URL:`) <br/>
+  a. If not already there, add the apache, jboss, and jboss-releases to the Available Member repositories: <br/>
 
 Now the workshop environment is completely setup and ready to go.
 
