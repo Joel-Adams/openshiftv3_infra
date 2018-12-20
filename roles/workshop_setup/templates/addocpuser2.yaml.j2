@@ -10,4 +10,4 @@
   - name: create directory
     file: path=/etc/origin/master state=directory
   - name: add initial OpenShift user
-    shell: "htpasswd -b /etc/origin/master/htpasswd {{ lookup('env','SUDOUSER') }} \"{{ lookup('env','PASSWORD') }}\""
+    shell: {% raw %}"htpasswd -b /etc/origin/master/htpasswd {{ lookup('env','SUDOUSER') }} \"{{ lookup('env','PASSWORD') }}\""{% endraw %}
