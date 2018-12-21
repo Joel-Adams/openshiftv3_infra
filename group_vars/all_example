@@ -48,7 +48,7 @@ key_vault_name:                   "" # Name of the key vault
 key_vault_secret:                 "" # Name of the secret key
 #--------------------------------------------------------------------------------------
 #networking                |      Azure Networking Information
-virtual_network_resource_group:   "ocpv3_workshop"
+#virtual_network_resource_group:   "ocpv3_workshop"
 virtual_network_name:             "oshiftvnet"
 address_prefixes:                 "10.0.0.0/14"
 master_subnet_name:               "oshiftmastersubnet"
