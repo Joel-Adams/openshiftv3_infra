@@ -1,4 +1,4 @@
-# file: roles/azure.infra.terraform/handlers/main.yml
+# file: roles/azure.infra/handlers/main.yml
 ---
 # For example,
 #
