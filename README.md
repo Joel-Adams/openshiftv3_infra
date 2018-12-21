@@ -203,7 +203,7 @@ You can either shut down the environment via the Azure Portal as to not incur VM
 
 If you choose to shut the environment down, there will be some necessary steps to take when spinning it back up.
 
-First ssh into the bastion hosts using the private key.
+First ssh into the bastion hosts using the private key. Then:
 ```
 sudo su -
 docker rm nginx-proxy wetty-cntr
