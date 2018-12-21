@@ -200,3 +200,21 @@ Provide each student with a user number 1-50, bastion DNS name, master DNS name,
 ## Once the workshop is completed
 
 You can either shut down the environment via the Azure Portal as to not incur VM charges, or delete the resource group that was created to not incur any additional charges. If you choose to delete the resource group be sure to first un-register each host from Red Hat subscription manager via [click here](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/installation_guide/chap-subscription-management-unregistering), or log into access.redhat.com and delete the systems from your subscriptions.
+
+If you choose to shut the environment down, there will be some necessary steps to take when spinning it back up.
+
+First ssh into the bastion hosts using the private key.
+```
+sudo su -
+docker rm nginx-proxy wetty-cntr
+cd /var/tmp
+rm -rf github hugo
+cd /home/{{ openshift_admin_username }}
+rm -rf dockyard epel-release-latest-7.noarch.rpm
+```
+Once that is completed you can re-run the third playbook on your local system. After this completes the system will be ready to go once again.
+
+```
+ansible-playbook -u {{ openshift_admin_username }} 3_setup_bastion_host.yml --private-key {{ /etc/ssh/oshift_key_rsa }}
+
+```
