@@ -173,15 +173,15 @@ Log into the Nexus console using the route provided. User name `admin` password 
 1. Go to settings -> Repositories
 2. Select Create Repository -> maven2(proxy) <br/>
   a. Name: apache <br/>
-  b. Remote storage: http://nexus-nexus.104.209.170.217.nip.io/repository/apache/ <br/>
+  b. Remote storage: https://repo.maven.apache.org/maven2/ <br/>
   c. Create Repository <br/>
 3. Select Create Repository -> maven2(proxy) <br/>
   a. Name: jboss <br/>
-  b. Remote storage: http://nexus-nexus.104.209.170.217.nip.io/repository/jboss/ <br/>
+  b. Remote storage: https://maven.repository.redhat.com/ga/ <br/>
   c. Create Repository <br/>
 4. Select Create Repository -> maven2(proxy) <br/>
   a. Name: jboss-releases <br/>
-  b. Remote storage: http://nexus-nexus.104.209.170.217.nip.io/repository/jboss-releases/ <br/>
+  b. Remote storage: https://maven.repository.redhat.com/earlyaccess/all/ <br/>
   c. Create Repository   <br/>
 5. Select maven-public (This will give you the URL needed for the workshop exercises under `URL:`) <br/>
   a. If not already there, add the apache, jboss, and jboss-releases to the Available Member repositories: <br/>
