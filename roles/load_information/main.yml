@@ -1,4 +1,4 @@
-# file: roles/ansible.tower/defaults/main.yml
+# file: roles/load_information/defaults/main.yml
 ---
 #
 # foo: default
