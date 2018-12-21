@@ -50,17 +50,17 @@ key_vault_secret:                 "" # Name of the secret key
 #networking                |      Azure Networking Information
 virtual_network_resource_group:   "ocpv3_workshop"
 virtual_network_name:             "openshiftvnet"
-address_prefixes:                 "13.0.0.0/14"
+address_prefixes:                 "10.0.0.0/14"
 master_subnet_name:               "mastersubnet"
-master_subnet_prefix:             "13.1.0.0/16"
+master_subnet_prefix:             "10.1.0.0/16"
 infra_subnet_name:                "infrasubnet"
-infra_subnet_prefix:              "13.2.0.0/16"
+infra_subnet_prefix:              "10.2.0.0/16"
 node_subnet_name:                 "nodesubnet"
-node_subnet_prefix:               "13.3.0.0/16"
+node_subnet_prefix:               "10.3.0.0/16"
 routing_cert_type:                "selfsigned"
 master_cert_type:                 "selfsigned"
-master_private_cluster_ip:	      "13.1.0.200"
-router_private_cluster_ip:        "13.2.0.201"
+master_private_cluster_ip:	      "10.1.0.200"
+router_private_cluster_ip:        "10.2.0.201"
 #--------------------------------------------------------------------------------------
 #Environment Variables     |      Variables once playbook 1 has completed
 bastion_fqdn:                     ""
