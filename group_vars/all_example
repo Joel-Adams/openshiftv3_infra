@@ -25,7 +25,7 @@ resource_group_name:              "ocpv3_workshop"
 number_master_nodes:              "3"            # 1,3, or 5 master nodes
 number_infra_nodes:               "3"            # 1,2, or 3 Infrastructure Nodes
 number_nodes:                     "2"            # 1-30 Application Nodes
-master_vm_size:                   "Standard_E2s_v3"    # Master VM Size
+master_vm_size:                   "Standard_E4s_v3"    # Master VM Size
 node_vm_size:                     "Standard_D4s_v3"    # Node Instance Size
 infra_vm_size:                    "Standard_D4s_v3"    # Infra Instance Size
 cns_vm_size:                      "Standard_E4s_v3"    # CNS Instance Size
